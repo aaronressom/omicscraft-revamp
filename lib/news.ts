@@ -1,30 +1,26 @@
 /**
  * News & announcements.
  *
- * ⚠️  EVERY ENTRY BELOW IS A PLACEHOLDER (`placeholder: true`).
+ * Every entry below is a REAL, dated announcement supplied by OmicsCraft and
+ * checked against its own source before publication. Two corrections came out
+ * of that check and are noted inline — the supplied publication title contained
+ * a typo, and no publication date was supplied.
  *
- * No real OmicsCraft announcement, press release, publication or award date
- * was available when this page was built. Rather than invent announcements for
- * a real company — fabricated corporate news is materially misleading, and a
- * grant award notice is exactly the kind of thing people rely on — these entries
- * are scaffolded from facts already published on omicscraft.com (the six SBIR
- * projects and the four-tool aiSysMet suite) with **placeholder dates and
- * summaries**.
+ * The `placeholder` flag remains in the type. An earlier draft of this page
+ * carried six scaffolded entries behind a visible "not for publication" banner;
+ * the mechanism is kept so any future draft entry re-arms that banner
+ * automatically rather than depending on someone remembering a switch.
  *
- * Nothing here states a dollar amount, a grant number, a journal, a quote, or a
- * partner name, because none of those were verifiable.
- *
- * While any entry has `placeholder: true`, the /news page renders a visible
- * notice at the top. Replacing the entries with real items removes that notice
- * automatically — there is no separate flag to remember to switch off.
- *
- * TO PUBLISH: replace each entry with a real announcement, set a real `date`,
- * and delete `placeholder: true`.
+ * RULE: do not add an entry here that has not been verified against a primary
+ * source. Corporate news — awards, publications, releases — is exactly the
+ * category people rely on.
  */
 
 export type NewsCategory =
-  | "Grant Award"
+  | "Publication"
+  | "Presentation"
   | "Platform Update"
+  | "Grant Award"
   | "Research"
   | "Company";
 
@@ -32,70 +28,61 @@ export type NewsItem = {
   slug: string;
   title: string;
   summary: string;
-  /** ISO 8601. Placeholder entries carry approximate, unverified dates. */
+  /** ISO 8601. See `datePrecision` when the day is not known. */
   date: string;
+  /**
+   * "month" renders as e.g. "July 2026". Used where only a month was supplied —
+   * inventing a specific day on a real announcement is a small fabrication that
+   * this page should not make.
+   */
+  datePrecision?: "day" | "month";
   category: NewsCategory;
+  /** External source: the paper, the session page, the application. */
+  href?: string;
   featured?: boolean;
-  /** Remove once the entry describes a real, dated announcement. */
+  /** Set only on scaffolded drafts; re-arms the "not for publication" banner. */
   placeholder?: boolean;
 };
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
-    slug: "aisysmet-phase-ii",
+    slug: "embc-2026-dce-mri",
     title:
-      "aiSysMet advances to Phase II SBIR for integrative analysis of multimodal data",
+      "OmicsCraft presents a tumor-centric deep learning framework for survival prediction at IEEE EMBC 2026",
     summary:
-      "Phase II support continues development of the AI-powered, cloud-based platform for integrative analysis of imaging and multi-omics data from TCGA, CPTAC and TCIA via the Cancer Research Data Commons.",
-    date: "2026-05-14",
-    category: "Grant Award",
+      "Sara Hashemi presented “Tumor-Centric Deep Learning Framework for Survival Prediction in Multiphase DCE-MRI” in the Oncologic Imaging and Radiogenomics session at IEEE EMBC 2026 in Toronto, Ontario.",
+    date: "2026-07-28",
+    category: "Presentation",
+    href: "https://cmsworkshops.com/EMBC2026/view_paper.php?PaperNum=3915&SessionID=1029",
+  },
+  {
+    /**
+     * Title, date, volume and issue verified against the journal.
+     * The title supplied read "...systems metabolomics GOT biomarker
+     * discovery"; the published title reads "...FOR biomarker discovery",
+     * which is what appears here. No publication date was supplied — the
+     * journal gives 15 July 2026.
+     */
+    slug: "aisysmet-bioinformatics",
+    title:
+      "aiSysMet published in Bioinformatics: AI-powered systems metabolomics for biomarker discovery",
+    summary:
+      "The paper describing the aiSysMet platform appears in Bioinformatics, volume 42, issue 7. It sets out the cloud-based approach to LC-MS data processing, metabolite annotation, and multi-omics integration for disease biomarker discovery.",
+    date: "2026-07-15",
+    category: "Publication",
+    href: "https://academic.oup.com/bioinformatics/article/42/7/btag520/8735226",
     featured: true,
-    placeholder: true,
   },
   {
-    slug: "metaboquest-phase-ii",
-    title: "MetaboQuest receives Phase II SBIR support for metabolite annotation",
+    /* Supplied as "July 2026" with no day — hence month precision. */
+    slug: "aisysmet-v1-5",
+    title: "aiSysMet v1.5 released",
     summary:
-      "The suite addresses the central bottleneck in metabolomics — metabolite identification — by combining compound databases, pathways, biochemical networks and mass spectral libraries.",
-    date: "2026-03-02",
-    category: "Grant Award",
-    placeholder: true,
-  },
-  {
-    slug: "aisysmet-four-tools",
-    title: "aiSysMet brings MetCraft, MetaboQuest, ImgCraft and IntSys into one suite",
-    summary:
-      "Four integrated tools now span raw data processing, metabolite annotation, medical image analysis, and cross-omics biomarker selection within a single cloud platform.",
-    date: "2026-01-21",
+      "The latest release of the aiSysMet platform is available, bringing MetCraft, MetaboQuest, ImgCraft and IntSys together in a single cloud workspace for building analysis pipelines.",
+    date: "2026-07-01",
+    datePrecision: "month",
     category: "Platform Update",
-    placeholder: true,
-  },
-  {
-    slug: "imgcraft-imaging-pipeline",
-    title: "ImgCraft extends the platform to whole slide, CT and MR imaging",
-    summary:
-      "Image segmentation, feature extraction and quantitative analysis bring medical imaging into the same workflow as multi-omics measurements.",
-    date: "2025-11-06",
-    category: "Platform Update",
-    placeholder: true,
-  },
-  {
-    slug: "intsys-generative-ai",
-    title: "IntSys applies statistical, machine learning and generative AI methods",
-    summary:
-      "Integrative analysis across multi-omics and imaging data supports biomarker selection using a combination of classical statistics and modern model families.",
-    date: "2025-09-18",
-    category: "Research",
-    placeholder: true,
-  },
-  {
-    slug: "sbir-portfolio",
-    title: "Six federally funded SBIR projects supported by NIH and NSF",
-    summary:
-      "Two Phase II and four Phase I awards span systems metabolomics, metabolite identification, and integrative analysis of multi-omics and imaging data.",
-    date: "2025-07-30",
-    category: "Company",
-    placeholder: true,
+    href: "https://tools.omicscraft.com/aiSysMet/",
   },
 ];
 
@@ -113,18 +100,27 @@ export function featuredNews(): NewsItem | undefined {
 }
 
 export const CATEGORY_STYLES: Record<NewsCategory, string> = {
-  "Grant Award":
-    "border-emerald-500/30 bg-emerald-500/10 text-emerald-ink",
+  Publication: "border-emerald-500/30 bg-emerald-500/10 text-emerald-ink",
+  Presentation: "border-navy-700/25 bg-navy-900/[0.06] text-navy-800",
   "Platform Update": "border-cyan-500/30 bg-cyan-500/10 text-cyan-ink",
+  "Grant Award": "border-emerald-500/30 bg-emerald-500/10 text-emerald-ink",
   Research: "border-navy-700/25 bg-navy-900/[0.06] text-navy-800",
   Company: "border-slate-300 bg-slate-100 text-slate-700",
 };
 
-export function formatNewsDate(iso: string): string {
+export function formatNewsDate(
+  iso: string,
+  precision: "day" | "month" = "day",
+): string {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
-    day: "numeric",
+    ...(precision === "day" ? { day: "numeric" } : null),
     timeZone: "UTC",
   });
+}
+
+/** `datetime` attribute: YYYY-MM for month precision, full ISO otherwise. */
+export function newsDateTime(item: NewsItem): string {
+  return item.datePrecision === "month" ? item.date.slice(0, 7) : item.date;
 }

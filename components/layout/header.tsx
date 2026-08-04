@@ -53,7 +53,9 @@ export function Header() {
       )}
     >
       <Container>
-        <div className="flex h-20 items-center justify-between gap-6">
+        {/* h-24: the official lockup is wider and taller than the previous
+            mark-plus-text approximation and needs the extra room. */}
+        <div className="flex h-24 items-center justify-between gap-6">
           <Link
             href="/"
             className="inline-flex min-h-11 items-center rounded-lg"
@@ -73,7 +75,12 @@ export function Header() {
                       href={item.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "relative flex h-11 items-center rounded-lg px-4 text-sm font-medium transition-colors",
+                        // whitespace-nowrap: "Software Platform" otherwise
+                        // wraps to two lines at the lg breakpoint, leaving its
+                        // active underline stranded below the other items.
+                        // Tighter padding buys back the width that costs, and
+                        // relaxes again at xl where there is room.
+                        "relative flex h-11 items-center whitespace-nowrap rounded-lg px-2.5 text-sm font-medium transition-colors xl:px-4",
                         active
                           ? "text-white"
                           : "text-slate-300 hover:text-white",

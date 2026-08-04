@@ -1,4 +1,4 @@
-import { Landmark, Microscope } from "lucide-react";
+import { Award, Landmark, Microscope } from "lucide-react";
 
 import { Container } from "@/components/layout/container";
 import { GlowBackdrop } from "@/components/visuals/glow-backdrop";
@@ -27,7 +27,12 @@ export function TrustBand() {
 
       <Container className="relative">
         {/* Metrics */}
-        <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <Award className="size-3.5" aria-hidden />
+          SBIR-Funded Projects
+        </h2>
+
+        <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:gap-4">
           {TRUST_STATS.map((stat) => (
             <div
               key={stat.label}

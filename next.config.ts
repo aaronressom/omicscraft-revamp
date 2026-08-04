@@ -3,39 +3,27 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /**
    * Preserve inbound links and search rankings from the old Wix site.
-   * Verified against https://www.omicscraft.com/pages-sitemap.xml, which lists
-   * /services, /research and /aboutus. `/products` is not in the sitemap but is
-   * linked from the live navigation, so it is redirected as a safety net.
+   *
+   * Verified against https://www.omicscraft.com/pages-sitemap.xml (/services,
+   * /research, /aboutus) plus the live navigation. Note `/tools` — that is the
+   * real old products page; `/products` returns 404 there, and is kept only as
+   * a harmless safety net for anything that ever guessed it.
    */
   async redirects() {
     return [
       { source: "/aboutus", destination: "/about", permanent: true },
       { source: "/research", destination: "/projects", permanent: true },
+      { source: "/tools", destination: "/platform", permanent: true },
       { source: "/products", destination: "/platform", permanent: true },
     ];
   },
-
-  /**
-   * Keep this staging deployment out of search engines.
-   *
-   * This build carries placeholder News entries (invented dates announcing SBIR
-   * awards for a real company) and unfinished product links. None of that
-   * should be indexable, and a Vercel *production* deployment — which the first
-   * deploy of a project becomes by default — is indexable unless told otherwise.
-   *
-   * REMOVE THIS BLOCK (and `app/robots.ts`) ONLY when the site is genuinely
-   * ready to launch: real news entries, real product URLs, client sign-off.
-   */
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, nofollow" },
-        ],
-      },
-    ];
-  },
 };
+
+/*
+ * Indexing note: an `X-Robots-Tag: noindex` header used to sit here while the
+ * News page carried placeholder announcements. Those are now real, verified
+ * entries, and the client has opted in to indexing — so the header is gone and
+ * `app/robots.ts` allows crawling.
+ */
 
 export default nextConfig;

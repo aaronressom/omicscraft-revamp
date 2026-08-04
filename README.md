@@ -38,7 +38,10 @@ npm run dev                  # http://localhost:3000
 plus `POST /api/contact`.
 
 Legacy Wix URLs redirect permanently (308): `/aboutus → /about`,
-`/research → /projects`, `/products → /platform`.
+`/research → /projects`, `/tools → /platform`, `/products → /platform`.
+
+Note `/tools` is the real old products page — `/products` 404s on the old site
+and is kept only as a safety net.
 
 ## Editing content
 
@@ -93,29 +96,51 @@ reintroduce invented figures here.**
 
 ### News page
 
-[`lib/news.ts`](lib/news.ts) currently holds **placeholder entries only**, each
-flagged `placeholder: true`. They are scaffolded from projects already published
-on omicscraft.com, with unverified dates and summaries; none states a dollar
-amount, grant number, journal, quote, or partner.
+[`lib/news.ts`](lib/news.ts) holds three **real, verified** announcements: the
+Bioinformatics paper, the IEEE EMBC 2026 talk, and the aiSysMet v1.5 release.
+Each was checked against its primary source before publication, which caught two
+things worth keeping in mind:
 
-While any entry carries that flag, `/news` renders a prominent
-"Sample content — not for publication" notice. Replacing the entries with real,
-dated announcements and dropping the flag removes the notice automatically —
-there is no separate switch to remember.
+- the supplied paper title read "…systems metabolomics **got** biomarker
+  discovery"; the published title reads "…**for**", which is what ships;
+- the release was supplied as "July 2026" with no day, so it uses
+  `datePrecision: "month"` and renders as "July 2026". **Do not invent a day** to
+  make a date look tidier.
+
+**Rule: no entry goes on this page without a primary source.** The
+`placeholder: true` flag remains in the type — set it on any draft entry and
+`/news` re-arms a prominent "Sample content — not for publication" banner
+automatically.
 
 ## Outstanding — needs client input
 
 1. ~~Product logo files~~ — **done.** Recovered from the live site's `/tools`
    page into `public/logos/`. Note `intsys.png` is only 193×121 and will look
    soft if ever displayed large; a higher-resolution original would help.
-2. **AWS product URLs** → the `href` fields in `PLATFORM` and `PRODUCTS` in
-   `lib/content.ts`. A `null` href renders an inert "Coming soon" tile rather
-   than a dead link.
+   The official lockup (`public/brand/omicscraft-logo.png`) came from
+   `tools.omicscraft.com`. **It is white-on-transparent — dark backgrounds
+   only.** A light-background placement needs a dark-ink version supplied; do
+   not recolour it with CSS filters.
+2. **Remaining product URLs** → `href` on MetCraft, MetaboQuest, ImgCraft and
+   IntSys in `lib/content.ts`. A `null` href renders an inert "Coming soon" tile
+   rather than a dead link. `PLATFORM.href` is **done**
+   (`tools.omicscraft.com/aiSysMet/`).
 3. **NIH SBIR/STTR and NSF logo files** — lazy-loaded on the old Wix site and
    not extractable. Funding is currently credited typographically.
 4. **Social profile URLs** → `SITE.social` in `lib/content.ts`. All are `null`,
    so no social icons render (a dead link is worse than none).
 5. `RESEND_API_KEY` for the contact form.
+
+## Indexing
+
+The site is **indexable**: [`app/robots.ts`](app/robots.ts) allows crawling
+(except `/api/`) and there is no `X-Robots-Tag` header. A `noindex` guard existed
+while the News page carried placeholder entries; it was lifted once those became
+real and the client opted in.
+
+Two things are therefore publicly visible in their current state: the four tools
+show "Coming soon" until their URLs land, and the contact form returns a
+configuration error until `RESEND_API_KEY` is set.
 
 ## Accessibility
 

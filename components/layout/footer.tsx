@@ -11,7 +11,7 @@ const COMPANY_LINKS = [
 ];
 
 const PLATFORM_LINKS = [
-  { label: "aiSysMet", href: "/platform" },
+  { label: "Software Platform", href: "/platform" },
   { label: "Services", href: "/services" },
 ];
 

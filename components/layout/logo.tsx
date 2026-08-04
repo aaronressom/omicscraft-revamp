@@ -2,40 +2,30 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /**
- * The OmicsCraft mark plus wordmark.
+ * The official OmicsCraft lockup — hexagon mark plus wordmark.
  *
- * The wordmark is set in type rather than shipped as the original raster
- * logo: the source PNG is 304x248 with the wordmark baked in at low
- * resolution, which goes soft on retina displays. Rendering the word as live
- * text keeps it crisp at any size, stays selectable, and is readable to
- * screen readers without alt-text duplication.
+ * This is the letterhead artwork, sourced from the company's own application
+ * server (`tools.omicscraft.com/.../logoWix.png`) so the site matches the
+ * branding already in production. It replaces an earlier approximation that
+ * paired the hexagon with the wordmark set in Plus Jakarta Sans — the real
+ * wordmark is an engraved small-caps face that type substitution did not match.
+ *
+ * DARK BACKGROUNDS ONLY. The wordmark is pure white with no dark variant, so it
+ * disappears on light surfaces. Every current placement (header over the dark
+ * hero band, mobile drawer, footer) is dark. If a light-background placement is
+ * ever needed, a dark-ink version of the artwork has to be supplied — do not
+ * attempt to recolour this one with CSS filters, which would also invert the
+ * mark's blue and red.
  */
-export function Logo({
-  className,
-  onDark = true,
-}: {
-  className?: string;
-  onDark?: boolean;
-}) {
+export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <Image
-        src="/brand/omicscraft-mark.png"
-        alt=""
-        width={304}
-        height={248}
-        priority
-        className="h-8 w-auto"
-      />
-      <span
-        className={cn(
-          "font-display text-xl font-bold tracking-tight",
-          onDark ? "text-white" : "text-navy-900",
-        )}
-      >
-        Omics
-        <span className={onDark ? "text-cyan-400" : "text-cyan-ink"}>Craft</span>
-      </span>
-    </span>
+    <Image
+      src="/brand/omicscraft-logo.png"
+      alt="OmicsCraft"
+      width={1095}
+      height={269}
+      priority
+      className={cn("h-11 w-auto", className)}
+    />
   );
 }

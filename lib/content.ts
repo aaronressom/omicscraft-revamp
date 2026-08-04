@@ -49,7 +49,7 @@ export const SITE = {
 } as const;
 
 export const NAV = [
-  { label: "Platform", href: "/platform" },
+  { label: "Software Platform", href: "/platform" },
   { label: "Services", href: "/services" },
   { label: "Projects", href: "/projects" },
   { label: "News", href: "/news" },
@@ -63,7 +63,7 @@ export const NAV = [
 
 export const HERO = {
   eyebrow: "NIH & NSF SBIR-funded",
-  headline: "From raw omics data to validated biomarkers.",
+  headline: "From raw metabolomics data to biomarker discovery",
   subhead:
     "AI-powered bioinformatics tools and expert services that compress the path from data acquisition to discovery.",
   primaryCta: { label: "Explore aiSysMet", href: "/platform" },
@@ -72,8 +72,10 @@ export const HERO = {
 
 /** Stages rendered by the animated pipeline diagram. */
 export const PIPELINE_STAGES = [
-  { label: "Raw Data", detail: "LC-MS · imaging · multi-omics" },
-  { label: "Processing", detail: "Normalization · batch correction" },
+  { label: "Raw Data", detail: "LC-MS/MS" },
+  /* "Peak Detection" matches the shipping product: the live aiSysMet app lists
+     MetCraft's functions as Peak Detection and Batch Correction. */
+  { label: "Processing", detail: "Peak Detection · batch correction" },
   { label: "Annotation", detail: "Spectral matching · deep learning" },
   { label: "Integration", detail: "Multi-omics + imaging" },
   { label: "Biomarkers", detail: "Ranked candidates" },
@@ -85,11 +87,15 @@ export const PIPELINE_STAGES = [
 /* company's own site. If a fact cannot be sourced there, it does not belong.  */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Two boxes only, under the "SBIR-Funded Projects" heading rendered by
+ * `trust-band.tsx`. The former "6 Federally funded SBIR projects" total is now
+ * carried by that heading, and the "4 Integrated platform tools" box was
+ * dropped at the client's request.
+ */
 export const TRUST_STATS = [
-  { value: "6", label: "Federally funded SBIR projects" },
-  { value: "2", label: "Phase II awards" },
-  { value: "4", label: "Phase I awards" },
-  { value: "4", label: "Integrated platform tools" },
+  { value: "2", label: "Phase II SBIR Awards" },
+  { value: "4", label: "Phase I SBIR Awards" },
 ] as const;
 
 export const TRUST_DATA_SOURCES = ["TCGA", "CPTAC", "TCIA", "CRDC"] as const;
@@ -293,7 +299,8 @@ export type Product = {
 export const PLATFORM = {
   name: "aiSysMet",
   logo: "/logos/aisysmet.png",
-  href: null as string | null,
+  /** Live application, supplied by the client and verified running at v1.50. */
+  href: "https://tools.omicscraft.com/aiSysMet/" as string | null,
   /** @verbatim */
   blurb:
     "aiSysMet is an AI-powered data analytics platform that consists of a suite of tools (MetCraft, MetaboQuest, ImgCraft, and IntSys) for biomarker discovery by enabling systems metabolomics and integrative analysis of multi-omics and imaging data.",
@@ -430,13 +437,12 @@ export const HEADINGS = {
   },
   platform: {
     eyebrow: "Products",
-    title: "The aiSysMet platform",
-    description:
-      "Four integrated tools, available as a cloud-based suite for biomarker discovery.",
+    title: "Software Platform",
+    description: null,
   },
   projects: {
     eyebrow: "Projects",
-    title: "Federally funded research",
+    title: "Research Projects",
     description:
       "Six SBIR projects supported by the National Institutes of Health and the National Science Foundation.",
   },
@@ -452,9 +458,9 @@ export const HEADINGS = {
   },
   news: {
     eyebrow: "News",
-    title: "Announcements & milestones",
+    title: "Announcements",
     description:
-      "Awards, platform releases, and research updates from the OmicsCraft team.",
+      "Publications, presentations, and platform releases from the OmicsCraft team.",
   },
   contact: {
     eyebrow: "Contact",

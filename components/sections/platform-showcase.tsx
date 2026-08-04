@@ -1,8 +1,5 @@
-"use client";
-
 import { ArrowUpRight } from "lucide-react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { ProductLogo } from "@/components/ui/product-logo";
@@ -19,9 +16,15 @@ export type ProductWithAsset = Product & { logoAvailable: boolean };
  * aiSysMet showcase.
  *
  * SCOPE: presentational only. The products run on AWS and are owned by another
- * team; nothing here implements or proxies them. Each card is an outbound link.
- * A product with a null `href` renders as a non-interactive tile with a
- * "Coming soon" badge rather than a dead link.
+ * team; nothing here implements or proxies them. Each tool links out, and a
+ * tool with a null `href` renders an inert tile rather than a dead link.
+ *
+ * All four tools render simultaneously — the tab interface this replaced hid
+ * three quarters of the suite behind a control most visitors never touched.
+ * Per-tool logos are deliberately absent; the aiSysMet lockup above carries the
+ * branding and repeating four more logos crowded the schematics.
+ *
+ * No client state remains, so this is a server component.
  */
 export function PlatformShowcase({
   products,
@@ -31,12 +34,15 @@ export function PlatformShowcase({
   platformLogoAvailable: boolean;
 }) {
   return (
-    <section className="on-dark relative isolate overflow-hidden bg-navy-950 py-24 lg:py-32">
+    <section className="on-dark relative isolate overflow-hidden bg-navy-950 pb-24 pt-36 lg:pb-32 lg:pt-44">
       <GlowBackdrop intensity="subtle" grid={false} />
       <MolecularBackdrop />
 
       <Container className="relative">
+        {/* as="h1": this route has no PageHero, so the section heading is the
+            page's only top-level heading. */}
         <SectionHeading
+          as="h1"
           eyebrow={HEADINGS.platform.eyebrow}
           title={HEADINGS.platform.title}
           description={HEADINGS.platform.description}
@@ -53,7 +59,7 @@ export function PlatformShowcase({
           />
 
           <div>
-            <h3 className="type-h3 text-white">{PLATFORM.name}</h3>
+            <h2 className="type-h3 text-white">{PLATFORM.name}</h2>
             <p className="type-body measure mt-4 text-slate-300">
               {PLATFORM.blurb}
             </p>
@@ -71,79 +77,40 @@ export function PlatformShowcase({
           </div>
         </div>
 
-        {/* Tool tabs */}
-        <div className="mt-16">
-          <Tabs defaultValue={products[0]?.id}>
-            {/* overflow-y-hidden: without it the horizontal scroll container
-                also reports a vertical overflow and paints a stray scrollbar.
-                h-auto + h-11 on the trigger: the stock trigger inherits its
-                height from the list (25px here), under the 44px tap minimum. */}
-            <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto overflow-y-hidden border border-white/10 bg-white/[0.04] p-1.5">
-              {products.map((product) => (
-                <TabsTrigger
-                  key={product.id}
-                  value={product.id}
-                  /* The stock active state resolves to --background, which on a
-                     dark section is darker than the track and reads as a hole.
-                     Lift the active tab above the track instead. */
-                  className="h-11 px-4 text-sm text-slate-400 data-active:bg-white/12 data-active:text-white"
-                >
-                  {product.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        {/* All four tools, side by side */}
+        <ul className="mt-8 grid gap-6 lg:mt-10 lg:grid-cols-2 lg:gap-8">
+          {products.map((product) => (
+            <li key={product.id}>
+              <article className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+                <h2 className="type-h3 text-white">{product.name}</h2>
+                <p className="type-body mt-3 text-slate-300">{product.blurb}</p>
 
-            {products.map((product) => {
-              return (
-                <TabsContent
-                  key={product.id}
-                  value={product.id}
-                  className="mt-8 focus-visible:outline-none"
-                >
-                  {/* Schematic leads, copy follows: the data flow is the argument. */}
-                  <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14">
-                    <ToolFlow id={product.id} />
+                <div className="mt-7">
+                  <ToolFlow id={product.id} />
+                </div>
 
-                    <div className="flex flex-col">
-                      {/* The product logos already carry strong identity, so
-                          they are the lockup here - an extra generic icon
-                          alongside them just competed for attention. */}
-                      <ProductLogo
-                        src={product.logo}
-                        name={product.name}
-                        available={product.logoAvailable}
-                        className="aspect-auto h-20 w-auto max-w-[15rem] p-2.5"
-                      />
-
-                      <h3 className="type-h3 mt-6 text-white">
-                        {product.name}
-                      </h3>
-                      <p className="type-body measure mt-3 text-slate-300">
-                        {product.blurb}
-                      </p>
-
-                      <div className="mt-7">
-                        {product.href ? (
-                          <ButtonLink
-                            variant="outline"
-                            href={product.href}
-                            external
-                            className="h-11 border-white/25 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white"
-                          >
-                            Open {product.name}
-                            <ArrowUpRight aria-hidden />
-                          </ButtonLink>
-                        ) : (
-                          <ComingSoon label={`${product.name} access`} />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              );
-            })}
-          </Tabs>
-        </div>
+                {/* mt-auto: the four flows have different step counts, so
+                    without it each CTA floats at the end of its own content
+                    and they land at four different heights across the grid. */}
+                <div className="mt-auto pt-7">
+                  {product.href ? (
+                    <ButtonLink
+                      variant="outline"
+                      href={product.href}
+                      external
+                      className="h-11 border-white/25 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white"
+                    >
+                      Open {product.name}
+                      <ArrowUpRight aria-hidden />
+                    </ButtonLink>
+                  ) : (
+                    <ComingSoon label={`${product.name} access`} />
+                  )}
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
       </Container>
     </section>
   );

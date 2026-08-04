@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, TriangleAlert } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, TriangleAlert } from "lucide-react";
 
 import { Container } from "@/components/layout/container";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
@@ -7,6 +7,7 @@ import {
   HAS_PLACEHOLDER_NEWS,
   featuredNews,
   formatNewsDate,
+  newsDateTime,
   sortedNews,
   type NewsItem,
 } from "@/lib/news";
@@ -33,9 +34,9 @@ export function NewsList() {
 
         {rest.length > 0 ? (
           <>
-            <h2 className="type-h3 mt-16 text-navy-900">
-              Announcements
-            </h2>
+            {/* "More announcements": the page's h1 is already "Announcements",
+                so repeating it verbatim here read as a duplicate heading. */}
+            <h2 className="type-h3 mt-16 text-navy-900">More announcements</h2>
             <ul className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {rest.map((item) => (
                 <li key={item.slug}>
@@ -96,7 +97,7 @@ function FeaturedCard({ item }: { item: NewsItem }) {
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <CategoryTag item={item} />
-            <DateLine iso={item.date} />
+            <DateLine item={item} />
             <span className="rounded-full border border-slate-300 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wider text-slate-500">
               Featured
             </span>
@@ -106,6 +107,8 @@ function FeaturedCard({ item }: { item: NewsItem }) {
           <p className="measure mt-4 text-[1.0625rem] leading-relaxed text-slate-700">
             {item.summary}
           </p>
+
+          <SourceLink item={item} className="mt-6" />
         </div>
 
         {/* Decorative index card — no fabricated metric, just the date. */}
@@ -147,10 +150,56 @@ function NewsCard({ item }: { item: NewsItem }) {
         {item.summary}
       </p>
 
-      <div className="mt-5 border-t border-slate-200 pt-4">
-        <DateLine iso={item.date} />
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
+        <DateLine item={item} />
+        <SourceLink item={item} compact />
       </div>
     </article>
+  );
+}
+
+/**
+ * External source for an announcement — the paper, the session page, the app.
+ *
+ * Always an anchor with a visible affordance and an sr-only "(opens in new
+ * tab)", matching `ButtonLink`. Renders nothing when an entry has no source.
+ */
+function SourceLink({
+  item,
+  compact = false,
+  className,
+}: {
+  item: NewsItem;
+  compact?: boolean;
+  className?: string;
+}) {
+  if (!item.href) return null;
+
+  const label =
+    item.category === "Publication"
+      ? "Read the paper"
+      : item.category === "Presentation"
+        ? "View the session"
+        : "Open aiSysMet";
+
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "group/src inline-flex min-h-9 items-center gap-1.5 rounded-lg font-semibold text-cyan-ink hover:underline",
+        compact ? "text-[0.8rem]" : "text-sm",
+        className,
+      )}
+    >
+      {label}
+      <ArrowUpRight
+        className="size-4 transition-transform group-hover/src:-translate-y-0.5 group-hover/src:translate-x-0.5"
+        aria-hidden
+      />
+      <span className="sr-only"> (opens in new tab)</span>
+    </a>
   );
 }
 
@@ -167,11 +216,13 @@ function CategoryTag({ item }: { item: NewsItem }) {
   );
 }
 
-function DateLine({ iso }: { iso: string }) {
+function DateLine({ item }: { item: NewsItem }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[0.8rem] text-slate-500">
       <CalendarDays className="size-3.5" aria-hidden />
-      <time dateTime={iso}>{formatNewsDate(iso)}</time>
+      <time dateTime={newsDateTime(item)}>
+        {formatNewsDate(item.date, item.datePrecision)}
+      </time>
     </span>
   );
 }

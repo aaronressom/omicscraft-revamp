@@ -8,7 +8,7 @@ import { PLATFORM, PRODUCTS } from "@/lib/content";
 import { publicAssetExists } from "@/lib/assets";
 
 export const metadata: Metadata = {
-  title: "Platform",
+  title: "Software Platform",
   description: PLATFORM.blurb,
 };
 
