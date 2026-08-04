@@ -189,9 +189,18 @@
      text utilities and silently dropped them, so `cn("text-h2", "text-white")`
      emitted only `text-white` and headings rendered at 16px. Any new custom
      class must avoid Tailwind's utility prefixes for the same reason. */
+  /* The display/h2 curves are tuned so they keep scaling across the whole
+     laptop range instead of pinning to their maximum at ~1050px.
+
+     The old curves (4.4vw / 2.8vw) hit their cap almost immediately, so a
+     1280px viewport — what a 1920px screen produces at Windows' default 150%
+     display scaling — got the same 72px headline as a 1920px viewport. It
+     consumed 57% of the width there vs 39% at 1920 and read as "zoomed in".
+
+     Now: ~60px at 1280, ~72px at 1920. Same min and max as before. */
   .type-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);
+    font-size: clamp(2.75rem, 2.25rem + 1.875vw, 4.5rem);
     line-height: 1.05;
     letter-spacing: -0.03em;
     font-weight: 700;
@@ -199,7 +208,7 @@
 
   .type-h2 {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(2rem, 1.3rem + 2.8vw, 3rem);
+    font-size: clamp(2rem, 1.5rem + 1.25vw, 3rem);
     line-height: 1.12;
     letter-spacing: -0.025em;
     font-weight: 700;
