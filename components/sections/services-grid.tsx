@@ -32,7 +32,7 @@ const ICONS: Record<string, LucideIcon> = {
  */
 export function ServicesGrid({ withHeading = true }: { withHeading?: boolean }) {
   return (
-    <section className="relative isolate overflow-hidden bg-surface py-24 lg:py-32">
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
       {/* Light-variant chemistry watermark, echoing the previous site's use of
           skeletal structures behind body content. */}
       <MolecularBackdrop variant="light" />

@@ -14,9 +14,17 @@ import { cn } from "@/lib/utils";
 export function MolecularBackdrop({
   className,
   variant = "dark",
+  clearCenter = false,
 }: {
   className?: string;
   variant?: "dark" | "light";
+  /**
+   * Fades the artwork out through the middle of the section, leaving it at the
+   * edges. For centred content — the funding band — the structures otherwise
+   * run straight under the text and make it harder to read. The mask keeps the
+   * texture present without it competing with anything.
+   */
+  clearCenter?: boolean;
 }) {
   const stroke = variant === "dark" ? "rgb(255 255 255)" : "rgb(15 23 42)";
   const opacity = variant === "dark" ? 0.07 : 0.05;
@@ -28,6 +36,16 @@ export function MolecularBackdrop({
         "pointer-events-none absolute inset-0 overflow-hidden",
         className,
       )}
+      style={
+        clearCenter
+          ? {
+              maskImage:
+                "radial-gradient(ellipse 42% 70% at 50% 50%, transparent 40%, black 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 42% 70% at 50% 50%, transparent 40%, black 100%)",
+            }
+          : undefined
+      }
     >
       <svg
         className="absolute inset-0 h-full w-full"

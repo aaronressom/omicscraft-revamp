@@ -114,6 +114,14 @@ automatically.
 
 ## Outstanding — needs client input
 
+0. **Two files must be dropped in by hand** (both degrade gracefully until then):
+   - `public/img/lab-bench.jpg` — the lab photo behind the home-page motto.
+     Without it the motto band falls back to the dark molecular treatment.
+   - `public/papers/aisysmet-bioinformatics-2026.pdf` — the Bioinformatics
+     paper. Until it exists, "Read the paper" falls back to the free PMC full
+     text rather than 404ing. Redistribution is permitted: it is the company's
+     own article and Open Access under CC BY.
+
 1. ~~Product logo files~~ — **done.** Recovered from the live site's `/tools`
    page into `public/logos/`. Note `intsys.png` is only 193×121 and will look
    soft if ever displayed large; a higher-resolution original would help.

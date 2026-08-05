@@ -30,7 +30,7 @@ export function TeamGrid() {
   const [active, setActive] = useState<TeamMember | null>(null);
 
   return (
-    <section className="bg-surface py-24 lg:py-32">
+    <section className="bg-surface-tint py-24 lg:py-32">
       <Container>
         <SectionHeading
           eyebrow={HEADINGS.team.eyebrow}
@@ -88,30 +88,36 @@ export function TeamGrid() {
           if (!open) setActive(null);
         }}
       >
-        <DialogContent className="max-w-lg">
+        {/* `sm:max-w-2xl`, not `max-w-2xl`: DialogContent ships `sm:max-w-sm`,
+            and tailwind-merge treats a responsive variant as a different group
+            from the base utility — so a base `max-w-*` here loses above 640px.
+            Match the variant to actually override it.
+            max-h + overflow: the longest bio must not push the close button
+            off-screen on a short laptop viewport. */}
+        <DialogContent className="max-h-[85vh] w-[calc(100vw-2rem)] overflow-y-auto p-7 sm:max-w-2xl sm:p-9">
           {active ? (
             <>
               <DialogHeader>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-5">
                   <Image
                     src={active.photo}
                     alt=""
-                    width={72}
-                    height={72}
-                    className="size-18 shrink-0 rounded-xl object-cover"
+                    width={112}
+                    height={112}
+                    className="size-24 shrink-0 rounded-2xl object-cover"
                   />
                   <div className="min-w-0">
-                    <DialogTitle className="font-display text-lg font-semibold tracking-tight">
+                    <DialogTitle className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
                       {active.name}, {active.credential}
                     </DialogTitle>
-                    <p className="mt-0.5 text-sm font-medium text-cyan-ink">
+                    <p className="mt-1 text-[0.95rem] font-medium text-cyan-ink">
                       {active.role}
                     </p>
                   </div>
                 </div>
               </DialogHeader>
 
-              <DialogDescription className="text-[0.95rem] leading-relaxed text-slate-600">
+              <DialogDescription className="mt-2 text-base leading-[1.75] text-slate-600">
                 {active.bio}
               </DialogDescription>
             </>

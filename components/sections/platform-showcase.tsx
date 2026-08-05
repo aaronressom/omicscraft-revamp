@@ -34,7 +34,8 @@ export function PlatformShowcase({
   platformLogoAvailable: boolean;
 }) {
   return (
-    <section className="on-dark relative isolate overflow-hidden bg-navy-950 pb-24 pt-36 lg:pb-32 lg:pt-44">
+    /* No bottom padding: the light tool band below closes the section. */
+    <section className="on-dark relative isolate overflow-hidden bg-navy-950 pt-36 lg:pt-44">
       <GlowBackdrop intensity="subtle" grid={false} />
       <MolecularBackdrop />
 
@@ -77,41 +78,59 @@ export function PlatformShowcase({
           </div>
         </div>
 
-        {/* All four tools, side by side */}
-        <ul className="mt-8 grid gap-6 lg:mt-10 lg:grid-cols-2 lg:gap-8">
-          {products.map((product) => (
-            <li key={product.id}>
-              <article className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-                <h2 className="type-h3 text-white">{product.name}</h2>
-                <p className="type-body mt-3 text-slate-300">{product.blurb}</p>
-
-                <div className="mt-7">
-                  <ToolFlow id={product.id} />
-                </div>
-
-                {/* mt-auto: the four flows have different step counts, so
-                    without it each CTA floats at the end of its own content
-                    and they land at four different heights across the grid. */}
-                <div className="mt-auto pt-7">
-                  {product.href ? (
-                    <ButtonLink
-                      variant="outline"
-                      href={product.href}
-                      external
-                      className="h-11 border-white/25 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white"
-                    >
-                      Open {product.name}
-                      <ArrowUpRight aria-hidden />
-                    </ButtonLink>
-                  ) : (
-                    <ComingSoon label={`${product.name} access`} />
-                  )}
-                </div>
-              </article>
-            </li>
-          ))}
-        </ul>
       </Container>
+
+      {/* Colour break: the page header and the aiSysMet lockup above are both
+          navy, so the tool row sits on a light band. Without it the whole page
+          reads as one continuous slab of blue. */}
+      <div className="relative mt-16 border-y border-slate-200 bg-surface-tint py-14 lg:mt-20">
+        <MolecularBackdrop variant="light" />
+        <Container className="relative">
+          {/* All four tools in a single row. Two columns at md so the cards do
+              not become unreadably narrow on tablets. */}
+          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {products.map((product) => (
+              <li key={product.id}>
+                {/* Solid card, not a translucent tint: on the light band the
+                    previous bg-white/[0.02] was effectively invisible. */}
+                <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-navy-900">
+                    {product.name}
+                  </h2>
+                  <p className="mt-2 text-[0.85rem] leading-relaxed text-slate-600">
+                    {product.blurb}
+                  </p>
+
+                  {/* No `mt-auto` here. Bottom-aligning the schematics left a
+                      large gap under the three shorter blurbs; the client asked
+                      for the diagram to follow its text directly. */}
+                  <div className="pt-5">
+                    <ToolFlow id={product.id} compact variant="light" />
+                  </div>
+
+                  {/* No "coming soon" tile: with no tool URLs these cards are
+                      informational, and an inert badge on all four read as
+                      clutter. `product.href` still renders a real link if one
+                      is ever supplied. */}
+                  {product.href ? (
+                    <div className="mt-auto pt-4">
+                      <ButtonLink
+                        variant="outline"
+                        href={product.href}
+                        external
+                        className="h-10 w-full px-4 text-[0.8rem]"
+                      >
+                        Open {product.name}
+                        <ArrowUpRight aria-hidden />
+                      </ButtonLink>
+                    </div>
+                  ) : null}
+                </article>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </div>
     </section>
   );
 }

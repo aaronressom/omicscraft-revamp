@@ -30,21 +30,9 @@ export function AboutBlocks() {
   const [lead, ...rest] = [ABOUT.company, ABOUT.product, ABOUT.whoWeAre];
 
   return (
-    <section className="relative isolate overflow-hidden bg-white py-24 lg:py-32">
-      {/* Brand watermark. Fills the empty right field without competing with
-          text — clipped by the section and held well below body contrast. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 -top-16 hidden w-[34rem] opacity-[0.045] lg:block"
-      >
-        <Image
-          src="/brand/omicscraft-mark.png"
-          alt=""
-          width={304}
-          height={248}
-          className="h-auto w-full"
-        />
-      </div>
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
+      {/* The oversized watermark that used to bleed off the right edge is gone;
+          the mark now sits deliberately beside the Company card instead. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"
@@ -75,7 +63,7 @@ function AboutCard({
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-surface transition-all duration-300 hover:border-cyan-500/35 hover:shadow-xl hover:shadow-navy-950/[0.06] ${
+      className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-cyan-500/35 hover:shadow-xl hover:shadow-navy-950/[0.06] ${
         featured ? "p-7 lg:p-10" : "h-full p-7"
       }`}
     >
@@ -101,15 +89,31 @@ function AboutCard({
         </div>
       </div>
 
-      <p
-        className={`measure mt-5 leading-relaxed text-slate-700 ${
-          featured ? "text-[1.0625rem]" : "text-[0.975rem]"
-        }`}
-      >
-        {block.label === ABOUT.product.label
-          ? renderWithPlatformLink(block.body)
-          : block.body}
-      </p>
+      {featured ? (
+        /* The mark sits beside the copy rather than behind it. `sm:items-center`
+           keeps it optically aligned with a two- or three-line paragraph. */
+        /* sm:pr-6 pulls the mark in off the card edge — flush right read as
+           squished — and the larger size gives it presence beside the copy. */
+        <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-10 sm:pr-6">
+          <p className="flex-1 text-[1.0625rem] leading-relaxed text-slate-700">
+            {block.body}
+          </p>
+          <Image
+            src="/brand/omicscraft-mark.png"
+            alt=""
+            aria-hidden
+            width={304}
+            height={248}
+            className="h-24 w-auto shrink-0 self-start sm:h-32 sm:self-auto lg:h-36"
+          />
+        </div>
+      ) : (
+        <p className="measure mt-5 text-[0.975rem] leading-relaxed text-slate-700">
+          {block.label === ABOUT.product.label
+            ? renderWithPlatformLink(block.body)
+            : block.body}
+        </p>
+      )}
     </article>
   );
 }

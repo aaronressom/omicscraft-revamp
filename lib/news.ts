@@ -39,6 +39,18 @@ export type NewsItem = {
   category: NewsCategory;
   /** External source: the paper, the session page, the application. */
   href?: string;
+  /**
+   * Used when `href` points at a self-hosted file that is not present yet.
+   * Keeps the link working rather than shipping a 404 while the asset is
+   * outstanding. Resolved in `news-list.tsx` via `publicAssetExists`.
+   */
+  hrefFallback?: string;
+  /**
+   * Secondary link, where the source and the publisher's landing page differ.
+   * For the Bioinformatics paper: `href` is the free PMC full text (opens in
+   * the browser, never downloads) and `siteHref` is the journal's own page.
+   */
+  siteHref?: string;
   featured?: boolean;
   /** Set only on scaffolded drafts; re-arms the "not for publication" banner. */
   placeholder?: boolean;
@@ -70,7 +82,22 @@ export const NEWS_ITEMS: NewsItem[] = [
       "The paper describing the aiSysMet platform appears in Bioinformatics, volume 42, issue 7. It sets out the cloud-based approach to LC-MS data processing, metabolite annotation, and multi-omics integration for disease biomarker discovery.",
     date: "2026-07-15",
     category: "Publication",
-    href: "https://academic.oup.com/bioinformatics/article/42/7/btag520/8735226",
+    /**
+     * Self-hosted PDF, at the client's request — "Read the paper" must serve
+     * the paper itself rather than send people to a third-party site.
+     *
+     * Redistribution is permitted: the article is the company's own work and
+     * is Open Access under CC BY (confirmed via the NCBI OA service for
+     * PMC13412159), which allows reuse with attribution.
+     *
+     * The file is not in the repo yet — see `paperPdf` handling in
+     * `news-list.tsx`, which falls back to the free PMC full text until it is
+     * added at `public/papers/aisysmet-bioinformatics-2026.pdf`.
+     */
+    href: "/papers/aisysmet-bioinformatics-2026.pdf",
+    hrefFallback: "https://pmc.ncbi.nlm.nih.gov/articles/PMC13412159/",
+    siteHref:
+      "https://academic.oup.com/bioinformatics/article/42/7/btag520/8735226",
     featured: true,
   },
   {

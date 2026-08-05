@@ -100,10 +100,41 @@ export const TRUST_STATS = [
 
 export const TRUST_DATA_SOURCES = ["TCGA", "CPTAC", "TCIA", "CRDC"] as const;
 
+/** Official agency artwork, recovered from the company's own Wix CDN. */
 export const FUNDERS = [
-  { name: "National Institutes of Health — SBIR/STTR", short: "NIH" },
-  { name: "National Science Foundation", short: "NSF" },
+  {
+    name: "National Institutes of Health — SBIR/STTR",
+    short: "NIH",
+    logo: "/logos/nih-sbir.jpg",
+  },
+  {
+    name: "National Science Foundation",
+    short: "NSF",
+    logo: "/logos/nsf.jpg",
+  },
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/* Home motto band                                                            */
+/* -------------------------------------------------------------------------- */
+
+export const MOTTO = {
+  /**
+   * CLIENT-DIRECTED CLAIM — kept verbatim at their explicit instruction.
+   *
+   * "months to days" is a quantitative performance claim. It is NOT currently
+   * substantiated: the company's own Bioinformatics paper (42(7), btag520)
+   * lists "quantitative benchmarking of runtime, memory usage, metabolite
+   * annotation accuracy, and scalability" as FUTURE work, and the verbatim
+   * About copy says only "reduce the time and cost" with no magnitude.
+   *
+   * The client was shown this and chose to publish it as written. Do not treat
+   * this string as verified copy or reuse the figure elsewhere on the site.
+   */
+  headline: "Reduce biomarker discovery time from months to days!",
+  /** Decorative only — never captioned as OmicsCraft's own lab or staff. */
+  image: "/img/lab-bench.jpg",
+} as const;
 
 /* -------------------------------------------------------------------------- */
 /* Home summary cards - descriptions @verbatim                                 */
@@ -431,24 +462,24 @@ export const PROJECTS: Project[] = [
 export const HEADINGS = {
   services: {
     eyebrow: "Services",
-    title: "What we do",
+    title: null,
     description:
       "End-to-end support across the omics workflow, from study design through biological interpretation.",
   },
   platform: {
-    eyebrow: "Products",
-    title: "Software Platform",
+    eyebrow: "Software Platform",
+    title: null,
     description: null,
   },
   projects: {
     eyebrow: "Projects",
-    title: "Research Projects",
+    title: null,
     description:
       "Six SBIR projects supported by the National Institutes of Health and the National Science Foundation.",
   },
   about: {
     eyebrow: "About us",
-    title: "Who we are",
+    title: null,
     description: null,
   },
   team: {
@@ -458,13 +489,13 @@ export const HEADINGS = {
   },
   news: {
     eyebrow: "News",
-    title: "Announcements",
+    title: null,
     description:
       "Publications, presentations, and platform releases from the OmicsCraft team.",
   },
   contact: {
     eyebrow: "Contact",
-    title: "Start a conversation",
+    title: null,
     description:
       "Tell us about your study and we will get back to you.",
   },

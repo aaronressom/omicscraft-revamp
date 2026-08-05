@@ -1,23 +1,20 @@
 import { Hero } from "@/components/sections/hero";
+import { MottoBand } from "@/components/sections/motto-band";
 import { TrustBand } from "@/components/sections/trust-band";
-import { PlatformStrip } from "@/components/sections/platform-strip";
-import { ServicesGrid } from "@/components/sections/services-grid";
-import type { ProductWithAsset } from "@/components/sections/platform-showcase";
-import { PRODUCTS } from "@/lib/content";
-import { publicAssetExists } from "@/lib/assets";
 
+/**
+ * Landing page.
+ *
+ * Deliberately minimal at the client's direction: the platform strip and the
+ * services grid were removed from here, so the top nav is the only route into
+ * those pages.
+ */
 export default function Home() {
-  const products: ProductWithAsset[] = PRODUCTS.map((product) => ({
-    ...product,
-    logoAvailable: publicAssetExists(product.logo),
-  }));
-
   return (
     <main id="main">
       <Hero />
+      <MottoBand />
       <TrustBand />
-      <PlatformStrip products={products} />
-      <ServicesGrid />
     </main>
   );
 }

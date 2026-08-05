@@ -25,7 +25,11 @@ export function Logo({ className }: { className?: string }) {
       width={1095}
       height={269}
       priority
-      className={cn("h-11 w-auto", className)}
+      /* w-fit is load-bearing: the footer places this in a `flex flex-col`,
+         whose default align-items:stretch pulls the image to the full column
+         width while h-11 pins the height — stretching the lockup. `w-auto`
+         does not override stretch; `w-fit` does. Inert in the header's row. */
+      className={cn("h-11 w-fit max-w-full object-contain", className)}
     />
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SITE } from "@/lib/content";
@@ -11,7 +11,16 @@ const inter = Inter({
   display: "swap",
 });
 
-const jakarta = Plus_Jakarta_Sans({
+/**
+ * Display face. Space Grotesk replaced Plus Jakarta Sans: the geometric
+ * Jakarta letterforms are narrow and close-fitting, which is what made the
+ * hero headline read as one continuous word. Space Grotesk sits wider on the
+ * line and has a more technical character suited to the audience.
+ *
+ * Swapping it is a one-line change — the rest of the type scale reads from
+ * the --font-display variable.
+ */
+const displayFont = Space_Grotesk({
   variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
@@ -64,7 +73,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jakarta.variable} h-full`}
+      className={`${inter.variable} ${displayFont.variable} h-full`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-white">

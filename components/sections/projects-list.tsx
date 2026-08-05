@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
  */
 export function ProjectsList() {
   return (
-    <section className="bg-surface py-24 lg:py-32">
+    <section className="bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
       <Container>
         {/* Base UI: `multiple` + array `defaultValue` (no type/collapsible).
             hiddenUntilFound keeps every abstract in the DOM, so browser
@@ -50,7 +50,11 @@ export function ProjectsList() {
               </AccordionTrigger>
 
               <AccordionContent>
-                <p className="measure pb-6 text-[0.95rem] leading-relaxed text-slate-700">
+                {/* No `measure` here. It caps the line at 65ch while the panel
+                    runs the full card width, which is why the abstracts looked
+                    like they stopped short of the container. pr-8 keeps the
+                    text clear of the chevron in the trigger above. */}
+                <p className="pb-6 pr-8 text-[0.95rem] leading-relaxed text-slate-700">
                   {project.abstract}
                 </p>
               </AccordionContent>

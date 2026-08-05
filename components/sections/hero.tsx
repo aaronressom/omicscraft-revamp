@@ -24,15 +24,10 @@ export function Hero() {
       <Container className="relative pb-20 pt-36 lg:pb-28 lg:pt-44">
         <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-16">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300">
-              <span
-                aria-hidden
-                className="size-1.5 rounded-full bg-cyan-400"
-              />
-              {HERO.eyebrow}
-            </span>
-
-            <h1 className="type-display measure-tight mt-6 text-white">
+            {/* The "NIH & NSF SBIR-funded" badge moved out of the hero and now
+                sits at the top of the funding band, where the awards it refers
+                to actually are. */}
+            <h1 className="type-display measure-tight text-white">
               {HERO.headline}
             </h1>
 

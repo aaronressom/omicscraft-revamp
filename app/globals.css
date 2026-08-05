@@ -36,6 +36,10 @@
 
   --color-surface: #f8fafc;
   --color-surface-alt: #f1f5f9;
+  /* Cool tinted band used to break up long runs of navy. Distinct from
+     `surface` (neutral slate) so consecutive light sections still read as
+     two different sections rather than one continuous block. */
+  --color-surface-tint: #ecfbfd;
 
   --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
 }
@@ -149,7 +153,21 @@
     @apply border-border;
   }
 
+  /* GLOBAL SCALE.
+     The client reviews the site at 80% browser zoom and wants that density to
+     be the default. Root font-size drives every rem in the design, so one
+     value rescales type, spacing and radii together and keeps the proportions
+     intact.
+
+     Set to 87.5% (14px) rather than a literal 80% (12.8px): at 80% the body
+     copy lands near 13px, which is below comfortable reading size for long
+     scientific paragraphs and below what browser accessibility settings
+     assume. Paired with the reduced section padding below, the page density
+     matches the 80% view closely while body text stays legible.
+
+     To go further, lower this single number — nothing else needs to change. */
   html {
+    font-size: 87.5%;
     @apply font-sans antialiased;
     scroll-behavior: smooth;
   }
@@ -198,17 +216,25 @@
      consumed 57% of the width there vs 39% at 1920 and read as "zoomed in".
 
      Now: ~60px at 1280, ~72px at 1920. Same min and max as before. */
+  /* Leading and tracking were opened up (1.05 -> 1.14, -0.03em -> -0.015em):
+     at display sizes the previous values read as cramped, with descenders
+     nearly touching the line below. The font is unchanged. */
+  /* Spacing opened up twice now. The remaining complaint was that the headline
+     "looks like one long word" — that is word-spacing, not tracking, so the
+     gaps between words are widened explicitly rather than just relaxing the
+     letter-spacing further (which would only loosen the words themselves). */
   .type-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(2.75rem, 2.25rem + 1.875vw, 4.5rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
+    font-size: clamp(2.6rem, 2.1rem + 1.55vw, 4.25rem);
+    line-height: 1.18;
+    letter-spacing: -0.005em;
+    word-spacing: 0.2em;
     font-weight: 700;
   }
 
   .type-h2 {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(2rem, 1.5rem + 1.25vw, 3rem);
+    font-size: clamp(2rem, 1.5rem + 1.05vw, 3rem);
     line-height: 1.12;
     letter-spacing: -0.025em;
     font-weight: 700;
@@ -216,7 +242,7 @@
 
   .type-h3 {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+    font-size: clamp(1.375rem, 1.1rem + 0.85vw, 1.75rem);
     line-height: 1.25;
     letter-spacing: -0.02em;
     font-weight: 600;
@@ -228,7 +254,7 @@
   }
 
   .type-lead {
-    font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
+    font-size: clamp(1.0625rem, 1rem + 0.34vw, 1.25rem);
     line-height: 1.65;
   }
 

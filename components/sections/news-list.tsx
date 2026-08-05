@@ -1,7 +1,14 @@
-import { ArrowRight, ArrowUpRight, CalendarDays, TriangleAlert } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  CalendarDays,
+  Download,
+  TriangleAlert,
+} from "lucide-react";
 
 import { Container } from "@/components/layout/container";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
+import { publicAssetExists } from "@/lib/assets";
 import {
   CATEGORY_STYLES,
   HAS_PLACEHOLDER_NEWS,
@@ -24,7 +31,7 @@ export function NewsList() {
   const rest = sortedNews().filter((item) => item.slug !== featured?.slug);
 
   return (
-    <section className="relative isolate overflow-hidden bg-surface py-20 lg:py-28">
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-20 pt-12 lg:pb-24 lg:pt-14">
       <MolecularBackdrop variant="light" />
 
       <Container className="relative">
@@ -111,24 +118,38 @@ function FeaturedCard({ item }: { item: NewsItem }) {
           <SourceLink item={item} className="mt-6" />
         </div>
 
-        {/* Decorative index card — no fabricated metric, just the date. */}
-        <div
-          aria-hidden
-          className="hidden rounded-2xl border border-slate-200 bg-surface p-6 lg:block"
-        >
-          <span className="block font-display text-5xl font-bold tracking-tight text-navy-900">
-            {new Date(`${item.date}T00:00:00Z`).getUTCFullYear()}
-          </span>
-          <span className="mt-2 block text-sm text-slate-500">
-            {new Date(`${item.date}T00:00:00Z`).toLocaleDateString("en-US", {
-              month: "long",
-              timeZone: "UTC",
-            })}
-          </span>
-          <span className="mt-5 flex items-center gap-2 text-sm font-semibold text-cyan-ink">
-            Latest
-            <ArrowRight className="size-4" aria-hidden />
-          </span>
+        {/* Index card. The year/month block stays decorative, but the link is
+            deliberately OUTSIDE the aria-hidden subtree — a focusable anchor
+            inside hidden content is reachable by keyboard yet invisible to
+            screen readers. */}
+        <div className="hidden rounded-2xl border border-slate-200 bg-surface p-6 lg:block">
+          <div aria-hidden>
+            <span className="block font-display text-5xl font-bold tracking-tight text-navy-900">
+              {new Date(`${item.date}T00:00:00Z`).getUTCFullYear()}
+            </span>
+            <span className="mt-2 block text-sm text-slate-500">
+              {new Date(`${item.date}T00:00:00Z`).toLocaleDateString("en-US", {
+                month: "long",
+                timeZone: "UTC",
+              })}
+            </span>
+          </div>
+
+          {item.siteHref ? (
+            <a
+              href={item.siteHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/site mt-5 inline-flex min-h-9 items-center gap-2 rounded-lg text-sm font-semibold text-cyan-ink hover:underline"
+            >
+              View on {publisherName(item.siteHref)}
+              <ArrowRight
+                className="size-4 transition-transform group-hover/site:translate-x-0.5"
+                aria-hidden
+              />
+              <span className="sr-only"> (opens in new tab)</span>
+            </a>
+          ) : null}
         </div>
       </div>
     </article>
@@ -175,18 +196,33 @@ function SourceLink({
 }) {
   if (!item.href) return null;
 
+  // A self-hosted target that has not been added yet falls back to its remote
+  // equivalent, so the link is never a 404 while the file is outstanding.
+  const isLocal = item.href.startsWith("/");
+  const href =
+    isLocal && !publicAssetExists(item.href)
+      ? (item.hrefFallback ?? item.href)
+      : item.href;
+  // `download` only works same-origin — a browser ignores it on a cross-origin
+  // URL. So it is applied solely when the self-hosted PDF is actually present,
+  // and the label matches what will really happen.
+  const servesLocalPdf = href.startsWith("/") && href.endsWith(".pdf");
+
   const label =
     item.category === "Publication"
-      ? "Read the paper"
+      ? servesLocalPdf
+        ? "Download the paper (PDF)"
+        : "Read the paper"
       : item.category === "Presentation"
         ? "View the session"
         : "Open aiSysMet";
 
   return (
     <a
-      href={item.href}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={href}
+      {...(servesLocalPdf
+        ? { download: "aiSysMet-Bioinformatics-2026.pdf" }
+        : { target: "_blank", rel: "noopener noreferrer" })}
       className={cn(
         "group/src inline-flex min-h-9 items-center gap-1.5 rounded-lg font-semibold text-cyan-ink hover:underline",
         compact ? "text-[0.8rem]" : "text-sm",
@@ -194,13 +230,35 @@ function SourceLink({
       )}
     >
       {label}
-      <ArrowUpRight
-        className="size-4 transition-transform group-hover/src:-translate-y-0.5 group-hover/src:translate-x-0.5"
-        aria-hidden
-      />
-      <span className="sr-only"> (opens in new tab)</span>
+      {servesLocalPdf ? (
+        <Download
+          className="size-4 transition-transform group-hover/src:translate-y-0.5"
+          aria-hidden
+        />
+      ) : (
+        <ArrowUpRight
+          className="size-4 transition-transform group-hover/src:-translate-y-0.5 group-hover/src:translate-x-0.5"
+          aria-hidden
+        />
+      )}
+      {/* The announcement must match the behaviour: one downloads a file, the
+          other opens a tab. */}
+      <span className="sr-only">
+        {servesLocalPdf ? " (downloads a PDF)" : " (opens in new tab)"}
+      </span>
     </a>
   );
+}
+
+/** Names the destination so the link says where it goes, not just "Latest". */
+function publisherName(href: string): string {
+  if (href.includes("academic.oup.com")) return "Bioinformatics";
+  if (href.includes("cmsworkshops.com")) return "EMBC";
+  try {
+    return new URL(href).hostname.replace(/^www\./, "");
+  } catch {
+    return "publisher site";
+  }
 }
 
 function CategoryTag({ item }: { item: NewsItem }) {
