@@ -35,7 +35,7 @@ export function ServicesGrid({ withHeading = true }: { withHeading?: boolean }) 
     <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
       {/* Light-variant chemistry watermark, echoing the previous site's use of
           skeletal structures behind body content. */}
-      <MolecularBackdrop variant="light" />
+      <MolecularBackdrop variant="light" pattern={6} />
       <Container className="relative">
         {withHeading ? (
           <SectionHeading

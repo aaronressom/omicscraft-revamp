@@ -13,6 +13,7 @@ export default function ServicesPage() {
   return (
     <main id="main">
       <PageHero
+        pattern={1}
         eyebrow={HEADINGS.services.eyebrow}
         title={HEADINGS.services.title}
         description={HEADINGS.services.description}

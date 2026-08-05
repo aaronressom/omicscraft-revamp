@@ -42,7 +42,7 @@ export const SITE = {
   copyrightYear: 2026,
   /** TODO(client): supply real profile URLs, or these render disabled. */
   social: {
-    linkedin: null as string | null,
+    linkedin: "https://www.linkedin.com/company/omicscraft/" as string | null,
     facebook: null as string | null,
     twitter: null as string | null,
   },
@@ -63,12 +63,71 @@ export const NAV = [
 
 export const HERO = {
   eyebrow: "NIH & NSF SBIR-funded",
-  headline: "From raw metabolomics data to biomarker discovery",
+  headline: "From raw metabolomics data to biomarker discovery",
   subhead:
     "AI-powered bioinformatics tools and expert services that compress the path from data acquisition to discovery.",
   primaryCta: { label: "Explore aiSysMet", href: "/platform" },
   secondaryCta: { label: "Talk to our team", href: "/contact" },
 } as const;
+
+/**
+ * Home hero carousel — slide 1 is HERO above; slides 2-7 follow.
+ *
+ * COPY IS THE CLIENT'S, VERBATIM. Every headline and subhead below is taken
+ * word for word from the slider on the live omicscraft.com, as supplied. Do not
+ * reword them: they describe what the company does, and the wording was chosen
+ * by the company.
+ *
+ * The images are the client's own slider backgrounds, at their native 1920x730.
+ *
+ * CONTRAST. Three of these photographs are very light — the compound-ID bench,
+ * the monitors, and the test tubes are all close to white in places. The
+ * original omicscraft.com dealt with that per slide, tinting the type dark on
+ * pale images and light on dark ones, and it is exactly what produced the
+ * failing headline the rebuild was commissioned to fix. So every slide here
+ * carries the same measured dark scrim instead and the type is always white —
+ * see the note in `hero-carousel.tsx`. Adding a slide means adding an image
+ * that the existing scrim can carry, not tuning the scrim to the image.
+ */
+export const SLIDES = [
+  {
+    id: "interdisciplinary-solutions",
+    headline: "Interdisciplinary Solutions to Omics",
+    subhead: "Apply innovative strategies for omics data analysis",
+    image: "/slides/01-interdisciplinary-solutions.jpg",
+  },
+  {
+    id: "compound-identification",
+    headline: "Compound Identification",
+    subhead: "Use AI-powered tools for metabolite annotation",
+    image: "/slides/02-compound-identification.jpg",
+  },
+  {
+    id: "multi-omics-integration",
+    headline: "Multi-Omics Data Integration",
+    subhead: "Perform multi-omics data integration for biomarker discovery",
+    image: "/slides/03-multi-omics-integration.jpg",
+  },
+  {
+    id: "data-analytic-pipelines",
+    headline: "Data Analytic Pipelines",
+    subhead: "Build data analytic pipelines via a cloud-based platform",
+    image: "/slides/04-data-analytic-pipelines.jpg",
+  },
+  {
+    id: "interdisciplinary-team",
+    headline: "Interdisciplinary Team",
+    subhead: "Interact with experts in omics, medical images, and data science",
+    image: "/slides/05-interdisciplinary-team.jpg",
+  },
+  {
+    id: "consulting-services",
+    headline: "Consulting Services",
+    subhead:
+      "Experience end-to-end support from experimental design to technological insights",
+    image: "/slides/06-consulting-services.jpg",
+  },
+] as const;
 
 /** Stages rendered by the animated pipeline diagram. */
 export const PIPELINE_STAGES = [
@@ -132,8 +191,21 @@ export const MOTTO = {
    * this string as verified copy or reuse the figure elsewhere on the site.
    */
   headline: "Reduce biomarker discovery time from months to days!",
-  /** Decorative only — never captioned as OmicsCraft's own lab or staff. */
-  image: "/img/lab-bench.jpg",
+  /**
+   * Decorative only — never captioned as OmicsCraft's own lab or staff.
+   *
+   * THE PNG IS THE SOURCE, DELIBERATELY. This was briefly re-encoded to JPEG to
+   * save ~450KB, which stacked a second round of lossy compression on top of
+   * whatever the original already carried and showed as mush in the plaque.
+   * Next re-encodes to WebP/AVIF at serve time anyway, so the extra bytes never
+   * reach a browser and starting from a lossless master is strictly better.
+   *
+   * HARD CEILING: the client's original is only 537x310. The plaque caps its
+   * photo cell to stay near that, but on a 2x display some upscaling is
+   * unavoidable. A higher-resolution original dropped in at this path fixes it
+   * with no code change.
+   */
+  image: "/img/lab-bench.png",
 } as const;
 
 /* -------------------------------------------------------------------------- */

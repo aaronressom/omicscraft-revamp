@@ -1,6 +1,10 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
+import {
+  SOCIAL_LABELS,
+  SOCIAL_MARKS,
+} from "@/components/visuals/social-marks";
 import { Logo } from "@/components/layout/logo";
 import { FUNDERS, NAV, SITE } from "@/lib/content";
 
@@ -86,11 +90,19 @@ export function Footer() {
                     rel="noopener noreferrer"
                     className="inline-flex size-11 items-center justify-center rounded-xl text-slate-400 ring-1 ring-white/10 transition-colors hover:text-white hover:ring-white/25"
                   >
-                    <span className="text-sm font-semibold capitalize">
-                      {network.slice(0, 2)}
-                    </span>
+                    {/* Real glyph where we have one; the two-letter badge
+                        remains the fallback for any network without a mark, so
+                        adding a URL to SITE.social never renders nothing. */}
+                    {SOCIAL_MARKS[network] ? (
+                      SOCIAL_MARKS[network]({ className: "size-5" })
+                    ) : (
+                      <span className="text-sm font-semibold capitalize">
+                        {network.slice(0, 2)}
+                      </span>
+                    )}
                     <span className="sr-only">
-                      {SITE.name} on {network} (opens in new tab)
+                      {SITE.name} on {SOCIAL_LABELS[network] ?? network} (opens
+                      in new tab)
                     </span>
                   </a>
                 </li>

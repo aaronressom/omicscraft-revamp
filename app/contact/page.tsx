@@ -13,6 +13,7 @@ export default function ContactPage() {
   return (
     <main id="main">
       <PageHero
+        pattern={5}
         eyebrow={HEADINGS.contact.eyebrow}
         title={HEADINGS.contact.title}
         description={HEADINGS.contact.description}

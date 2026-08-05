@@ -14,6 +14,7 @@ export default function AboutPage() {
   return (
     <main id="main">
       <PageHero
+        pattern={4}
         eyebrow={HEADINGS.about.eyebrow}
         title={HEADINGS.about.title}
         description={HEADINGS.about.description}

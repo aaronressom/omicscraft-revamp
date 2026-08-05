@@ -5,6 +5,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Container } from "@/components/layout/container";
+import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
+import { FcoiPolicy } from "@/components/sections/fcoi-policy";
 import { PROJECTS } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -13,20 +15,29 @@ import { cn } from "@/lib/utils";
  *
  * The live site prints all six full abstracts inline, producing a wall of text
  * several screens deep. Collapsing them keeps every word available - nothing is
- * summarized - while making the list scannable. The first is open by default so
- * the section never reads as empty.
+ * summarized - while making the list scannable.
+ *
+ * Every item starts closed. An earlier draft opened the first one so the
+ * section would not read as empty, but that gave aiSysMet a full screen of
+ * abstract on arrival while the other five were a single line each — it looked
+ * like the page had one project and five footnotes.
+ *
+ * The FCOI policy renders at the end of this same list rather than as its own
+ * section (see fcoi-policy.tsx).
  */
 export function ProjectsList() {
   return (
-    <section className="bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
-      <Container>
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
+      <MolecularBackdrop variant="light" subtle pattern={5} />
+
+      <Container className="relative">
         {/* Base UI: `multiple` + array `defaultValue` (no type/collapsible).
             hiddenUntilFound keeps every abstract in the DOM, so browser
             find-in-page and crawlers still reach collapsed text. */}
         <Accordion
           multiple={false}
           hiddenUntilFound
-          defaultValue={PROJECTS[0] ? [PROJECTS[0].id] : []}
+          defaultValue={[]}
           className="flex flex-col gap-3"
         >
           {PROJECTS.map((project) => (
@@ -61,6 +72,8 @@ export function ProjectsList() {
             </AccordionItem>
           ))}
         </Accordion>
+
+        <FcoiPolicy />
       </Container>
     </section>
   );

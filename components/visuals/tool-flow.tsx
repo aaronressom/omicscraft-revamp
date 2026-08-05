@@ -95,10 +95,17 @@ export function ToolFlow({
   id,
   compact = false,
   variant = "dark",
+  active = false,
 }: {
   id: string;
   /** "light" for the tinted platform band; "dark" for navy sections. */
   variant?: "dark" | "light";
+  /**
+   * Runs the flow animation: a highlight travelling from input to output, one
+   * node at a time. Driven by hover on the parent card, so only the diagram
+   * being looked at moves. See the `[data-flow-active]` rule in globals.css.
+   */
+  active?: boolean;
   /**
    * For the four-across platform layout, where each column is ~280px. Shrinks
    * the nodes, drops the sub-labels and step numbers, and — critically —
@@ -121,8 +128,14 @@ export function ToolFlow({
 
   const light = variant === "light";
 
+  // Position of each node in the pipeline, used to stagger the animation.
+  // Input is 0, then every stage in order, then the output last.
+  const stageCount = flow.stages.length;
+  const outputStep = stageCount + 1;
+
   return (
     <figure
+      data-flow-active={active ? "true" : undefined}
       className={cn(
         "rounded-2xl border",
         light
@@ -154,7 +167,13 @@ export function ToolFlow({
       </figcaption>
 
       <ol className="flex flex-col">
-        <Node {...flow.input} kind="input" compact={compact} light={light} />
+        <Node
+          {...flow.input}
+          kind="input"
+          compact={compact}
+          light={light}
+          step={0}
+        />
 
         {groups.map((group, groupIndex) => (
           <li key={groupIndex} className="contents">
@@ -167,26 +186,37 @@ export function ToolFlow({
                 group.length >= 3 && "sm:grid-cols-3",
               )}
             >
-              {group.map((stage) => (
-                <Node
-                  key={stage.label}
-                  {...stage}
-                  kind="stage"
-                  compact={compact}
-                  light={light}
-                  index={
-                    groups.slice(0, groupIndex).flat().length +
-                    group.indexOf(stage) +
-                    1
-                  }
-                />
-              ))}
+              {group.map((stage) => {
+                const index =
+                  groups.slice(0, groupIndex).flat().length +
+                  group.indexOf(stage) +
+                  1;
+                return (
+                  <Node
+                    key={stage.label}
+                    {...stage}
+                    kind="stage"
+                    compact={compact}
+                    light={light}
+                    index={index}
+                    // Parallel branches share a step, so they pulse together —
+                    // which is what a fork means.
+                    step={groups.slice(0, groupIndex).flat().length + 1}
+                  />
+                );
+              })}
             </div>
           </li>
         ))}
 
         <Connector compact={compact} light={light} />
-        <Node {...flow.output} kind="output" compact={compact} light={light} />
+        <Node
+          {...flow.output}
+          kind="output"
+          compact={compact}
+          light={light}
+          step={outputStep}
+        />
       </ol>
     </figure>
   );
@@ -198,6 +228,7 @@ function Node({
   icon: Icon,
   kind,
   index,
+  step = 0,
   compact = false,
   light = false,
 }: {
@@ -206,6 +237,8 @@ function Node({
   icon: LucideIcon;
   kind: "input" | "stage" | "output";
   index?: number;
+  /** Position in the pipeline; staggers the flow animation. */
+  step?: number;
   compact?: boolean;
   light?: boolean;
 }) {
@@ -214,7 +247,7 @@ function Node({
   return (
     <div
       className={cn(
-        "flex items-center rounded-xl border transition-colors",
+        "flow-node flex items-center rounded-xl border transition-colors",
         compact ? "gap-2.5 px-2.5 py-2" : "gap-3.5 px-4 py-3.5",
         light
           ? cn(
@@ -231,6 +264,9 @@ function Node({
                 "border-emerald-400/35 bg-emerald-400/[0.08] ring-1 ring-inset ring-emerald-400/10",
             ),
       )}
+      // Inert unless the figure carries data-flow-active; the delay is what
+      // makes the highlight travel rather than blink.
+      style={{ animationDelay: `${step * 0.34}s` }}
     >
       <span
         className={cn(

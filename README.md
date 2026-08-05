@@ -114,13 +114,30 @@ automatically.
 
 ## Outstanding — needs client input
 
-0. **Two files must be dropped in by hand** (both degrade gracefully until then):
-   - `public/img/lab-bench.jpg` — the lab photo behind the home-page motto.
-     Without it the motto band falls back to the dark molecular treatment.
+0. ~~Lab photo~~ — **done.** `public/img/lab-bench.png` (the client's
+   `Picture1.png`, kept lossless — see the note on MOTTO in `lib/content.ts`).
+   It is only 537×310, so the motto plaque caps its photo cell to stay near
+   that; a higher-resolution original at the same path would let the cell grow.
+
+0b. ~~Hero slide images~~ — **done.** The client's six slider backgrounds are in
+   `public/slides/` at their native 1920×730, wired to `SLIDES` in
+   `lib/content.ts`. Adding a slide means adding an image the existing scrim can
+   carry — see the contrast note in `components/sections/hero-carousel.tsx`.
+
+0c. ~~LinkedIn~~ — **done.** `SITE.social.linkedin`; renders in the footer and
+   as the closing tile of the News grid.
+
+1. **One file must still be dropped in by hand** (degrades gracefully until
+   then):
    - `public/papers/aisysmet-bioinformatics-2026.pdf` — the Bioinformatics
      paper. Until it exists, "Read the paper" falls back to the free PMC full
-     text rather than 404ing. Redistribution is permitted: it is the company's
-     own article and Open Access under CC BY.
+     text rather than 404ing; once present the link becomes a real download.
+     Redistribution is permitted: it is the company's own article and Open
+     Access under CC BY.
+
+     **It cannot be fetched programmatically.** PMC sits behind a Cloudflare
+     interstitial, the NCBI open-access package path 404s, Europe PMC has no
+     record, and OUP returns 403 — all re-checked. It has to be saved by hand.
 
 1. ~~Product logo files~~ — **done.** Recovered from the live site's `/tools`
    page into `public/logos/`. Note `intsys.png` is only 193×121 and will look

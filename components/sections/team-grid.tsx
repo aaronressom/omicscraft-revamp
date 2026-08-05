@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/layout/section-heading";
+import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
 import { HEADINGS, TEAM, type TeamMember } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -30,16 +31,30 @@ export function TeamGrid() {
   const [active, setActive] = useState<TeamMember | null>(null);
 
   return (
-    <section className="bg-surface-tint py-24 lg:py-32">
-      <Container>
+    /* Short top padding: the About blocks sit on the same tint directly above
+       and already carry their own bottom padding, so a full py-24 here left a
+       dead band between the two. */
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-32 lg:pt-16">
+      <MolecularBackdrop variant="light" subtle pattern={6} />
+
+      <Container className="relative">
         <SectionHeading
           eyebrow={HEADINGS.team.eyebrow}
           title={HEADINGS.team.title}
         />
 
-        <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* Flex-wrap with explicit widths rather than a CSS grid.
+            The team is seven people in a four-column grid, so the last row runs
+            3 + an empty cell — which reads as a vacancy, as though someone had
+            left. Grid cannot centre a short final row; flex-wrap +
+            justify-center can. The widths reproduce the grid exactly:
+            calc(100%/n - gap*(n-1)/n) with gap-5 = 1.25rem. */}
+        <ul className="mt-14 flex flex-wrap justify-center gap-5">
           {TEAM.map((member) => (
-            <li key={member.name}>
+            <li
+              key={member.name}
+              className="w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.3333%-0.8334rem)] xl:w-[calc(25%-0.9375rem)]"
+            >
               <button
                 type="button"
                 onClick={() => setActive(member)}

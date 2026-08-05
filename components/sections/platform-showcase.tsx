@@ -6,7 +6,7 @@ import { ProductLogo } from "@/components/ui/product-logo";
 import { ButtonLink } from "@/components/ui/button-link";
 import { GlowBackdrop } from "@/components/visuals/glow-backdrop";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
-import { ToolFlow } from "@/components/visuals/tool-flow";
+import { PlatformTools } from "@/components/sections/platform-tools";
 import { HEADINGS, PLATFORM, type Product } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +24,8 @@ export type ProductWithAsset = Product & { logoAvailable: boolean };
  * Per-tool logos are deliberately absent; the aiSysMet lockup above carries the
  * branding and repeating four more logos crowded the schematics.
  *
- * No client state remains, so this is a server component.
+ * This stays a server component: the only interactivity on the page is the
+ * connector and its hover states, which live in `PlatformTools`.
  */
 export function PlatformShowcase({
   products,
@@ -37,7 +38,7 @@ export function PlatformShowcase({
     /* No bottom padding: the light tool band below closes the section. */
     <section className="on-dark relative isolate overflow-hidden bg-navy-950 pt-36 lg:pt-44">
       <GlowBackdrop intensity="subtle" grid={false} />
-      <MolecularBackdrop />
+      <MolecularBackdrop pattern={6} fadeTop />
 
       <Container className="relative">
         {/* as="h1": this route has no PageHero, so the section heading is the
@@ -50,8 +51,13 @@ export function PlatformShowcase({
           onDark
         />
 
-        {/* Platform-level lockup */}
-        <div className="mt-14 grid items-center gap-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-10 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-14">
+        {/* Platform-level lockup.
+            Solid navy-900 rather than the old bg-white/[0.03]: a 3% white wash
+            over navy-950 is barely a shade apart from the page behind it, so
+            the panel had no edge and the copy inside read as floating loose on
+            the background. navy-900 is a real step up in lightness, which lifts
+            the whole block forward. */}
+        <div className="mt-8 grid items-center gap-10 rounded-3xl border border-white/12 bg-navy-900 p-6 shadow-xl shadow-navy-950/40 sm:p-10 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-14">
           <ProductLogo
             src={PLATFORM.logo}
             name={PLATFORM.name}
@@ -83,53 +89,9 @@ export function PlatformShowcase({
       {/* Colour break: the page header and the aiSysMet lockup above are both
           navy, so the tool row sits on a light band. Without it the whole page
           reads as one continuous slab of blue. */}
-      <div className="relative mt-16 border-y border-slate-200 bg-surface-tint py-14 lg:mt-20">
-        <MolecularBackdrop variant="light" />
-        <Container className="relative">
-          {/* All four tools in a single row. Two columns at md so the cards do
-              not become unreadably narrow on tablets. */}
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {products.map((product) => (
-              <li key={product.id}>
-                {/* Solid card, not a translucent tint: on the light band the
-                    previous bg-white/[0.02] was effectively invisible. */}
-                <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                  <h2 className="font-display text-lg font-semibold tracking-tight text-navy-900">
-                    {product.name}
-                  </h2>
-                  <p className="mt-2 text-[0.85rem] leading-relaxed text-slate-600">
-                    {product.blurb}
-                  </p>
-
-                  {/* No `mt-auto` here. Bottom-aligning the schematics left a
-                      large gap under the three shorter blurbs; the client asked
-                      for the diagram to follow its text directly. */}
-                  <div className="pt-5">
-                    <ToolFlow id={product.id} compact variant="light" />
-                  </div>
-
-                  {/* No "coming soon" tile: with no tool URLs these cards are
-                      informational, and an inert badge on all four read as
-                      clutter. `product.href` still renders a real link if one
-                      is ever supplied. */}
-                  {product.href ? (
-                    <div className="mt-auto pt-4">
-                      <ButtonLink
-                        variant="outline"
-                        href={product.href}
-                        external
-                        className="h-10 w-full px-4 text-[0.8rem]"
-                      >
-                        Open {product.name}
-                        <ArrowUpRight aria-hidden />
-                      </ButtonLink>
-                    </div>
-                  ) : null}
-                </article>
-              </li>
-            ))}
-          </ul>
-        </Container>
+      <div className="relative mt-16 border-y border-slate-200 bg-surface-tint py-14">
+        <MolecularBackdrop variant="light" pattern={3} />
+        <PlatformTools products={products} />
       </div>
     </section>
   );

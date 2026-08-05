@@ -1,18 +1,34 @@
 import { Mail, MapPin, Phone, Map as MapIcon } from "lucide-react";
 
 import { Container } from "@/components/layout/container";
+import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
 import { ContactForm } from "@/components/sections/contact-form";
 import { SITE } from "@/lib/content";
 
 /* No "use client" needed any more: with the map loading automatically this
    section holds no state. ContactForm remains its own client component. */
 
+/**
+ * Contact.
+ *
+ * TWO PANELS, NOT SIX FLOATING PIECES. The details, the map, the form and its
+ * submit row previously sat directly on the tinted background as separate
+ * fragments, which read as clutter rather than as two things to do. They are
+ * now grouped into one solid white card each — "here is where we are" and
+ * "here is how to reach us" — so the page has exactly two objects on it.
+ *
+ * Solid white on purpose: a translucent panel over the tint produced a third
+ * in-between colour and made the grouping ambiguous, which was the problem the
+ * grouping was meant to solve.
+ */
 export function ContactSection() {
   return (
-    <section className="bg-surface-tint py-24 lg:py-32">
-      <Container>
-        <div className="grid gap-14 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-20">
-          <div className="flex flex-col gap-8">
+    <section className="relative isolate overflow-hidden bg-surface-tint py-24 lg:py-32">
+      <MolecularBackdrop variant="light" subtle pattern={1} />
+
+      <Container className="relative">
+        <div className="grid items-start gap-8 lg:grid-cols-[24rem_minmax(0,1fr)]">
+          <Panel>
             <ul className="flex flex-col gap-5">
               <ContactDetail icon={MapPin} label="Office">
                 <span className="not-italic">{SITE.address.full}</span>
@@ -36,12 +52,23 @@ export function ContactSection() {
             </ul>
 
             <MapCard />
-          </div>
+          </Panel>
 
-          <ContactForm />
+          <Panel>
+            <ContactForm />
+          </Panel>
         </div>
       </Container>
     </section>
+  );
+}
+
+/** The grouping bubble. Both columns use it, so they read as a matched pair. */
+function Panel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-full flex-col gap-7 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-8">
+      {children}
+    </div>
   );
 }
 
@@ -56,7 +83,9 @@ function ContactDetail({
 }) {
   return (
     <li className="flex gap-4">
-      <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-cyan-ink ring-1 ring-slate-200">
+      {/* bg-surface-tint, not bg-white: the chip now sits on a white panel,
+          where a white fill was invisible. */}
+      <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-tint text-cyan-ink ring-1 ring-slate-200">
         <Icon className="size-4.5" aria-hidden />
       </span>
       <span className="flex min-w-0 flex-col">
@@ -87,7 +116,9 @@ function MapCard() {
   const query = SITE.mapQuery;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    /* mt-auto pins the map to the bottom of the panel so both columns end
+       level regardless of how the address wraps. */
+    <div className="mt-auto overflow-hidden rounded-2xl border border-slate-200">
       <iframe
         title={`Map showing ${SITE.legalName} at ${SITE.address.full}`}
         src={`https://www.google.com/maps?q=${query}&output=embed`}

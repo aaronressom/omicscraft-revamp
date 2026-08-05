@@ -4,6 +4,7 @@ import { Building2, Cpu, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { Container } from "@/components/layout/container";
+import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
 import { ABOUT, PLATFORM } from "@/lib/content";
 
 /**
@@ -30,12 +31,15 @@ export function AboutBlocks() {
   const [lead, ...rest] = [ABOUT.company, ABOUT.product, ABOUT.whoWeAre];
 
   return (
-    <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-28 lg:pt-16">
-      {/* The oversized watermark that used to bleed off the right edge is gone;
-          the mark now sits deliberately beside the Company card instead. */}
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-14 pt-14 lg:pb-16 lg:pt-16">
+      <MolecularBackdrop variant="light" subtle pattern={2} />
+      {/* slate-400/70, not slate-200: this section and the team grid below sit
+          on the same tint, so the divider is the only thing separating them.
+          At slate-200 it had almost no contrast left against #ecfbfd and the
+          two ran together. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-400/70 to-transparent"
       />
 
       <Container className="relative">
@@ -63,8 +67,8 @@ function AboutCard({
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-cyan-500/35 hover:shadow-xl hover:shadow-navy-950/[0.06] ${
-        featured ? "p-7 lg:p-10" : "h-full p-7"
+      className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-7 transition-all duration-300 hover:border-cyan-500/35 hover:shadow-xl hover:shadow-navy-950/[0.06] ${
+        featured ? "" : "h-full"
       }`}
     >
       {/* Left accent rail, brightening on hover */}
@@ -73,7 +77,9 @@ function AboutCard({
         className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-cyan-500 to-emerald-500 opacity-70 transition-opacity duration-300 group-hover:opacity-100"
       />
 
-      <div className="flex items-center gap-3">
+      {featured ? <CompanyWatermark /> : null}
+
+      <div className="relative flex items-center gap-3">
         <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/12 to-emerald-500/12 text-cyan-ink ring-1 ring-cyan-500/20">
           <Icon className="size-4.5" aria-hidden />
         </span>
@@ -89,32 +95,47 @@ function AboutCard({
         </div>
       </div>
 
-      {featured ? (
-        /* The mark sits beside the copy rather than behind it. `sm:items-center`
-           keeps it optically aligned with a two- or three-line paragraph. */
-        /* sm:pr-6 pulls the mark in off the card edge — flush right read as
-           squished — and the larger size gives it presence beside the copy. */
-        <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-10 sm:pr-6">
-          <p className="flex-1 text-[1.0625rem] leading-relaxed text-slate-700">
-            {block.body}
-          </p>
-          <Image
-            src="/brand/omicscraft-mark.png"
-            alt=""
-            aria-hidden
-            width={304}
-            height={248}
-            className="h-24 w-auto shrink-0 self-start sm:h-32 sm:self-auto lg:h-36"
-          />
-        </div>
-      ) : (
-        <p className="measure mt-5 text-[0.975rem] leading-relaxed text-slate-700">
-          {block.label === ABOUT.product.label
-            ? renderWithPlatformLink(block.body)
-            : block.body}
-        </p>
-      )}
+      {/* The Company paragraph is short. It briefly sat in a two-column row
+          with the mark rendered beside it as a solid image, which left the
+          card mostly empty — a few lines of text and a large logo with a gap
+          between them. It reads better as one plain paragraph over the
+          watermark, which is where the mark was to begin with. */}
+      <p
+        className={`relative mt-5 leading-relaxed text-slate-700 ${
+          /* pr-24, not pr-44: 11rem of reserved gutter pushed the paragraph so
+             far clear of the watermark that the card read as text on one side
+             and a mark on the other with a void between them. The mark is at
+             7% opacity, so the copy can run much closer to it. */
+          featured ? "text-[1.0625rem] sm:pr-24" : "measure text-[0.975rem]"
+        }`}
+      >
+        {block.label === ABOUT.product.label
+          ? renderWithPlatformLink(block.body)
+          : block.body}
+      </p>
     </article>
+  );
+}
+
+/**
+ * Hexagon mark, set into the Company card as a watermark.
+ *
+ * SIZED DOWN, NOT UP. The earlier watermark looked soft because it was scaled
+ * past the source: `omicscraft-mark.png` is 304x248, and blowing a 304px asset
+ * up to fill a card edge is what produced the mushy, stretched look. It is now
+ * capped below its native width and given explicit intrinsic dimensions, so the
+ * aspect ratio is fixed by the file rather than by the layout box.
+ */
+function CompanyWatermark() {
+  return (
+    <Image
+      src="/brand/omicscraft-mark.png"
+      alt=""
+      aria-hidden
+      width={304}
+      height={248}
+      className="pointer-events-none absolute -right-6 top-1/2 hidden w-56 max-w-none -translate-y-1/2 opacity-[0.07] sm:block"
+    />
   );
 }
 

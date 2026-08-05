@@ -78,8 +78,13 @@ export const NEWS_ITEMS: NewsItem[] = [
     slug: "aisysmet-bioinformatics",
     title:
       "aiSysMet published in Bioinformatics: AI-powered systems metabolomics for biomarker discovery",
+    /**
+     * @verbatim — supplied by the client, adapted from the paper's own
+     * Results abstract. Do not reword; the wording of a published scientific
+     * claim is not a copy decision.
+     */
     summary:
-      "The paper describing the aiSysMet platform appears in Bioinformatics, volume 42, issue 7. It sets out the cloud-based approach to LC-MS data processing, metabolite annotation, and multi-omics integration for disease biomarker discovery.",
+      "aiSysMet is an AI-powered software platform that uses statistical, machine learning, and deep learning methods for metabolomics data processing, metabolite annotation, and integrative analysis of multi-omics data. The platform’s interactive and modular web interface allows users to easily build data analysis pipelines that can be executed in the cloud.",
     date: "2026-07-15",
     category: "Publication",
     /**

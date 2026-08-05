@@ -8,7 +8,9 @@ import {
 
 import { Container } from "@/components/layout/container";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
+import { LinkedInMark } from "@/components/visuals/social-marks";
 import { publicAssetExists } from "@/lib/assets";
+import { SITE } from "@/lib/content";
 import {
   CATEGORY_STYLES,
   HAS_PLACEHOLDER_NEWS,
@@ -32,7 +34,7 @@ export function NewsList() {
 
   return (
     <section className="relative isolate overflow-hidden bg-surface-tint pb-20 pt-12 lg:pb-24 lg:pt-14">
-      <MolecularBackdrop variant="light" />
+      <MolecularBackdrop variant="light" pattern={6} />
 
       <Container className="relative">
         {HAS_PLACEHOLDER_NEWS ? <PlaceholderNotice /> : null}
@@ -50,6 +52,16 @@ export function NewsList() {
                   <NewsCard item={item} />
                 </li>
               ))}
+
+              {/* Sits as the last tile in the same grid rather than as a banner
+                  below it: this page is a short list of occasional
+                  announcements, and "the next one lands here" belongs at the
+                  end of that list, in the same shape as the cards it follows. */}
+              {SITE.social.linkedin ? (
+                <li>
+                  <FollowCard href={SITE.social.linkedin} />
+                </li>
+              ) : null}
             </ul>
           </>
         ) : null}
@@ -105,13 +117,21 @@ function FeaturedCard({ item }: { item: NewsItem }) {
           <div className="flex flex-wrap items-center gap-3">
             <CategoryTag item={item} />
             <DateLine item={item} />
-            <span className="rounded-full border border-slate-300 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wider text-slate-500">
-              Featured
+            {/* The emoji is decorative and aria-hidden — a screen reader
+                announcing "pushpin" before the word "Pinned" is noise, and
+                emoji names vary between platforms. */}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-50 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wider text-amber-700">
+              <span aria-hidden>📌</span>
+              Pinned
             </span>
           </div>
 
           <h2 className="type-h3 mt-5 text-navy-900">{item.title}</h2>
-          <p className="measure mt-4 text-[1.0625rem] leading-relaxed text-slate-700">
+          {/* No `measure`. It caps the line at 65ch, which on the featured card
+              stopped the summary a third of the way short of the date panel and
+              left a column of dead white between them. The grid gap is what
+              keeps the two apart. */}
+          <p className="mt-4 text-[1.0625rem] leading-relaxed text-slate-700">
             {item.summary}
           </p>
 
@@ -176,6 +196,49 @@ function NewsCard({ item }: { item: NewsItem }) {
         <SourceLink item={item} compact />
       </div>
     </article>
+  );
+}
+
+/**
+ * "Follow on LinkedIn" tile, closing the announcements grid.
+ *
+ * Deliberately styled as the inverse of a news card — dark where they are
+ * white — so it reads as an action rather than as another announcement someone
+ * might mistake for a dated item.
+ *
+ * The whole tile is one anchor, so the target is the full card rather than a
+ * small link inside it.
+ */
+function FollowCard({ href }: { href: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex h-full flex-col justify-between rounded-2xl border border-navy-800 bg-navy-900 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-lg hover:shadow-navy-950/20"
+    >
+      <div>
+        <span className="inline-flex size-10 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-400/25">
+          <LinkedInMark className="size-4.5" />
+        </span>
+
+        <h3 className="font-display mt-4 text-base font-semibold leading-snug tracking-tight text-white">
+          Follow OmicsCraft on LinkedIn
+        </h3>
+        <p className="mt-2 text-[0.925rem] leading-relaxed text-slate-400">
+          Papers, presentations and platform releases land there first.
+        </p>
+      </div>
+
+      <span className="mt-5 inline-flex min-h-9 items-center gap-1.5 border-t border-white/10 pt-4 text-[0.8rem] font-semibold text-cyan-300">
+        Open LinkedIn
+        <ArrowUpRight
+          className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+          aria-hidden
+        />
+        <span className="sr-only"> (opens in new tab)</span>
+      </span>
+    </a>
   );
 }
 

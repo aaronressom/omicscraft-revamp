@@ -13,6 +13,7 @@ export default function NewsPage() {
   return (
     <main id="main">
       <PageHero
+        pattern={3}
         eyebrow={HEADINGS.news.eyebrow}
         title={HEADINGS.news.title}
         description={HEADINGS.news.description}

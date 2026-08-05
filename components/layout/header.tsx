@@ -80,7 +80,7 @@ export function Header() {
                         // active underline stranded below the other items.
                         // Tighter padding buys back the width that costs, and
                         // relaxes again at xl where there is room.
-                        "relative flex h-11 items-center whitespace-nowrap rounded-lg px-2.5 text-sm font-medium transition-colors xl:px-4",
+                        "group relative flex h-11 items-center whitespace-nowrap rounded-lg px-2.5 text-sm font-medium transition-colors xl:px-4",
                         active
                           ? "text-white"
                           : "text-slate-300 hover:text-white",
@@ -98,7 +98,20 @@ export function Header() {
                             damping: 32,
                           }}
                         />
-                      ) : null}
+                      ) : (
+                        /* Hover preview of the active underline, wiping in from
+                           the left. Not part of the `layoutId` group — the
+                           shared-layout animation only tracks one element, and
+                           adding hover states to it would make the real
+                           indicator jump to whatever the pointer was over.
+                           This matters most on the landing page, which has no
+                           nav entry of its own and so had no underline at all
+                           until something else was active. */
+                        <span
+                          aria-hidden
+                          className="absolute inset-x-3 -bottom-px h-0.5 origin-left scale-x-0 rounded-full bg-cyan-400/70 transition-transform duration-300 ease-out group-hover:scale-x-100"
+                        />
+                      )}
                     </Link>
                   </li>
                 );

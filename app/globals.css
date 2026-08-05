@@ -280,6 +280,30 @@
     backdrop-filter: blur(12px);
     border: 1px solid oklch(1 0 0 / 12%);
   }
+
+  /* Data-flow schematics on the Software Platform tool cards.
+     Each node carries its own animation-delay, set inline from its position in
+     the flow, so the highlight travels down the pipeline in order rather than
+     every node blinking at once. It runs only while the parent card is
+     hovered — four diagrams looping permanently would be a fairground.
+     A ring rather than a colour change: nodes come in three kinds (input /
+     stage / output) with three different palettes, and an outline reads
+     identically on all of them without needing per-kind keyframes.
+     The prefers-reduced-motion block below stops this outright. */
+  [data-flow-active="true"] .flow-node {
+    animation: flow-node-pulse 3.4s ease-in-out infinite;
+  }
+}
+
+@keyframes flow-node-pulse {
+  0%,
+  55%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(6 182 212 / 0);
+  }
+  22% {
+    box-shadow: 0 0 0 3px rgb(6 182 212 / 0.4);
+  }
 }
 
 /* Honor reduced-motion globally, so no individual component can forget to. */

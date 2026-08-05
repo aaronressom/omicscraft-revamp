@@ -14,16 +14,26 @@ export function PageHero({
   eyebrow,
   title,
   description,
+  pattern = 0,
 }: {
   eyebrow?: string | null;
   /** Optional — omit it and the eyebrow becomes the page's h1. */
   title?: string | null;
   description?: string | null;
+  /**
+   * Which chemistry composition to draw. REQUIRED IN PRACTICE: every route
+   * passes a different one. This band is the same component on five pages, so
+   * leaving it at the default put the identical fragment behind the nav on all
+   * of them — which is what the client noticed.
+   */
+  pattern?: number;
 }) {
   return (
     <section className="on-dark relative isolate overflow-hidden bg-navy-950">
       <GlowBackdrop intensity="subtle" grid={false} />
-      <MolecularBackdrop />
+      {/* fadeTop: the header floats over this band, and artwork drawn behind
+          the nav links makes them harder to read. */}
+      <MolecularBackdrop pattern={pattern} fadeTop />
       {/* Padding tracks how much content the band actually holds. Without a
           display title it would otherwise be mostly empty space — and with
           neither title nor description it is a bare eyebrow, so it tightens
