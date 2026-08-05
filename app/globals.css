@@ -228,7 +228,13 @@
     font-size: clamp(2.6rem, 2.1rem + 1.55vw, 4.25rem);
     line-height: 1.18;
     letter-spacing: -0.005em;
-    word-spacing: 0.2em;
+    /* 0.03em, not 0.2em. This was raised to 0.2em when the headline was also
+       tracked at -0.03em and ran together as one long word. The tracking has
+       since been relaxed to -0.005em, so the natural word space is already
+       correct, and 0.2em on top of it adds ~12px per gap at the top of the
+       clamp — which is what read as strangely spaced. This is a whisper of
+       extra air, not a visible gap. */
+    word-spacing: 0.03em;
     font-weight: 700;
   }
 
@@ -291,7 +297,7 @@
      identically on all of them without needing per-kind keyframes.
      The prefers-reduced-motion block below stops this outright. */
   [data-flow-active="true"] .flow-node {
-    animation: flow-node-pulse 3.4s ease-in-out infinite;
+    animation: flow-node-pulse 9.6s ease-in-out infinite;
   }
 }
 
@@ -303,6 +309,31 @@
   }
   22% {
     box-shadow: 0 0 0 3px rgb(6 182 212 / 0.4);
+  }
+}
+
+/* Hero pipeline: the hand-off from one stage to the next.
+   Rather than the active hexagon jumping from 01 to 02, the bond between them
+   draws itself in over the stage's full dwell time and the current hexagon
+   brightens as it goes — so the step lands as a charge that completes, not as
+   a cut. Both run once per stage (`forwards`), restarted by a React key on
+   each advance. Duration is set inline from CYCLE_MS so the animation and the
+   timer cannot drift apart. */
+@keyframes bond-charge {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hex-charge {
+  from {
+    filter: drop-shadow(0 0 0 rgb(34 211 238 / 0));
+  }
+  to {
+    filter: drop-shadow(0 0 5px rgb(34 211 238 / 0.6));
   }
 }
 

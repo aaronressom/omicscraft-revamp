@@ -266,7 +266,9 @@ function Node({
       )}
       // Inert unless the figure carries data-flow-active; the delay is what
       // makes the highlight travel rather than blink.
-      style={{ animationDelay: `${step * 0.34}s` }}
+      // Delay must stay at 1/10 of the flow-node-pulse duration in globals.css
+      // (9.6s), so the last node fires before the loop restarts.
+      style={{ animationDelay: `${step * 0.96}s` }}
     >
       <span
         className={cn(

@@ -63,10 +63,17 @@ export function ContactSection() {
   );
 }
 
-/** The grouping bubble. Both columns use it, so they read as a matched pair. */
+/**
+ * The grouping bubble. Both columns use it, so they read as a matched pair.
+ *
+ * NO `h-full`. Stretching both panels to the taller of the two left a slab of
+ * empty white under the Send button, because the details-and-map column is
+ * always taller than the form. Level bottoms are not worth a dead half-screen
+ * inside the panel people are meant to fill in.
+ */
 function Panel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-full flex-col gap-7 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-8">
+    <div className="flex flex-col gap-7 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-8">
       {children}
     </div>
   );
@@ -116,9 +123,7 @@ function MapCard() {
   const query = SITE.mapQuery;
 
   return (
-    /* mt-auto pins the map to the bottom of the panel so both columns end
-       level regardless of how the address wraps. */
-    <div className="mt-auto overflow-hidden rounded-2xl border border-slate-200">
+    <div className="overflow-hidden rounded-2xl border border-slate-200">
       <iframe
         title={`Map showing ${SITE.legalName} at ${SITE.address.full}`}
         src={`https://www.google.com/maps?q=${query}&output=embed`}

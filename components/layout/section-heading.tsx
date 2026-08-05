@@ -89,7 +89,15 @@ export function SectionHeading({
             "type-lead measure",
             // Without a title above it the description is the first real line
             // of the page, so it carries a little more weight.
-            !hasTitle && "text-[1.15rem] sm:text-[1.25rem]",
+            //
+            // `text-balance` matters more here than it looks. At this size the
+            // 65ch measure cuts these one-sentence page intros a word or two
+            // early, dropping a lone trailing word onto line two — "…through
+            // biological / interpretation." That short second line reads as an
+            // indent or a new paragraph rather than a continuation, which is
+            // what the client saw on /services and /projects. Balancing splits
+            // the sentence across two even lines instead.
+            !hasTitle && "text-[1.15rem] text-balance sm:text-[1.25rem]",
             align === "center" && "mx-auto",
             onDark ? "text-slate-300" : "text-slate-600",
           )}

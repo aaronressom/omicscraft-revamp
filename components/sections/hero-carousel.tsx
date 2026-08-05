@@ -9,7 +9,10 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
 import { GlowBackdrop } from "@/components/visuals/glow-backdrop";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
-import { PipelineDiagram } from "@/components/visuals/pipeline-diagram";
+import {
+  PIPELINE_RUN_MS,
+  PipelineDiagram,
+} from "@/components/visuals/pipeline-diagram";
 import { HERO, SLIDES } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +30,7 @@ import { cn } from "@/lib/utils";
  * three of the six images are near-white in places. So the guard is structural
  * rather than per-image:
  *
- *   - a flat navy-950/80 wash over the entire photograph, plus
+ *   - a flat navy-950/50 wash over the entire photograph, plus
  *   - a left-weighted gradient darkening the side the text sits on.
  *
  * Every slide gets the same stack, so a new image cannot quietly break it — the
@@ -48,8 +51,19 @@ import { cn } from "@/lib/utils";
  * automatic change every few seconds would be noise.
  */
 
-/** ms between automatic advances. Long: these are sentences, not captions. */
-const AUTOPLAY_MS = 7000;
+/* ── TIMING ────────────────────────────────────────────────────────────────
+   Slide 0 is not a fixed duration: it holds until the pipeline diagram inside
+   it has actually finished its run, then a beat longer. PIPELINE_RUN_MS is
+   four hand-offs at CYCLE_MS (2.6s) = 10.4s to get from 01/05 to 05/05, plus
+   1s to let 05 land = 11.4s.
+
+   The six photographic slides then take that figure minus the one-second
+   beat — 10.4s — so the rotation keeps one cadence throughout instead of the
+   hero slide feeling like an outlier. Both derive from CYCLE_MS, so retiming
+   the pipeline retimes the carousel with it; do not hardcode either. */
+const HOLD_AFTER_PIPELINE_MS = 1000;
+const HERO_SLIDE_MS = PIPELINE_RUN_MS + HOLD_AFTER_PIPELINE_MS;
+const PHOTO_SLIDE_MS = HERO_SLIDE_MS - HOLD_AFTER_PIPELINE_MS;
 
 const TOTAL = SLIDES.length + 1;
 
@@ -70,11 +84,18 @@ export function HeroCarousel() {
   const next = useCallback(() => go(index + 1, 1), [go, index]);
   const previous = useCallback(() => go(index - 1, -1), [go, index]);
 
-  // Autoplay. Reset on every index change so a manual step gives a full
-  // interval before the next automatic one, rather than an abrupt jump.
+  // Autoplay. Reset on every index change — including a manual one — so
+  // stepping back to a slide gives it a full interval and the rotation carries
+  // on from there. (It used to stall instead: clicking an arrow focused the
+  // button, `onFocusCapture` latched `paused`, and nothing ever cleared it
+  // because focus never left the carousel. Focus now only pauses for keyboard
+  // users; see onFocusCapture.)
   useEffect(() => {
     if (paused || reduceMotion) return;
-    const timer = window.setTimeout(() => go(index + 1, 1), AUTOPLAY_MS);
+    const timer = window.setTimeout(
+      () => go(index + 1, 1),
+      index === 0 ? HERO_SLIDE_MS : PHOTO_SLIDE_MS,
+    );
     return () => window.clearTimeout(timer);
   }, [index, paused, reduceMotion, go]);
 
@@ -108,7 +129,14 @@ export function HeroCarousel() {
       onKeyDown={onKeyDown}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
+      onFocusCapture={(event) => {
+        // Keyboard focus only. A plain click on the prev/next buttons also
+        // focuses them, and pausing on that left the carousel stopped for
+        // good — the user's click meant "show me that slide", not "stop".
+        // :focus-visible is the browser's own read of keyboard vs pointer.
+        const target = event.target as Element;
+        if (target.matches?.(":focus-visible")) setPaused(true);
+      }}
       onBlurCapture={(event) => {
         // Only resume when focus actually leaves the carousel, not when it
         // moves between the controls inside it.
@@ -196,6 +224,12 @@ export function HeroCarousel() {
                 direction={direction}
                 reduceMotion={Boolean(reduceMotion)}
                 paused={paused || Boolean(reduceMotion)}
+                // Exactly the inputs that restart the slide timer below, so
+                // slide 0's pipeline remounts — and so replays from 01/05 —
+                // whenever that timer does. Deriving it beats a counter in
+                // state: there is no second source of truth to fall out of
+                // sync.
+                runKey={`${index}-${paused}`}
               />
             );
           })}
@@ -258,12 +292,15 @@ function SlidePanel({
   direction,
   reduceMotion,
   paused,
+  runKey,
 }: {
   position: number;
   isCurrent: boolean;
   direction: number;
   reduceMotion: boolean;
   paused: boolean;
+  /** Remount key for slide 0's pipeline; changes when the slide timer does. */
+  runKey: string;
 }) {
   const slide = position === 0 ? null : SLIDES[position - 1];
 
@@ -332,7 +369,11 @@ function SlidePanel({
               </div>
             </div>
 
-            <PipelineDiagram />
+            {/* Every slide stays mounted (see the grid note above), so the
+                pipeline has to be told when it is actually on screen —
+                otherwise it steps away unseen and slide 0 comes back round
+                showing 04/05. */}
+            <PipelineDiagram key={runKey} running={isCurrent} />
           </>
         )}
       </motion.div>
