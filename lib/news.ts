@@ -2,9 +2,13 @@
  * News & announcements.
  *
  * Every entry below is a REAL, dated announcement supplied by OmicsCraft and
- * checked against its own source before publication. Two corrections came out
- * of that check and are noted inline — the supplied publication title contained
- * a typo, and no publication date was supplied.
+ * checked against its own source before publication. Where the check corrected
+ * or filled in what was supplied — no publication date came with the
+ * Bioinformatics paper, for instance — it is noted inline on the entry.
+ *
+ * Headings and summaries are the client's own wording. They were rewritten to
+ * their current form on 6 Aug 2026 after the migration drafts ran long; treat
+ * them as copy the company owns rather than as text to tighten.
  *
  * The `placeholder` flag remains in the type. An earlier draft of this page
  * carried six scaffolded entries behind a visible "not for publication" banner;
@@ -58,51 +62,53 @@ export type NewsItem = {
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
+    /**
+     * Heading and summary are the client's own wording, supplied 6 Aug 2026,
+     * and replace the longer versions written during migration. The summary is
+     * the talk's title verbatim — do not reword it. The date and session link
+     * are unchanged and remain the ones verified against the EMBC programme.
+     */
     slug: "embc-2026-dce-mri",
-    title:
-      "OmicsCraft presents a tumor-centric deep learning framework for survival prediction at IEEE EMBC 2026",
+    title: "OmicsCraft gave a talk at EMBC 2026 in Toronto, ON",
     summary:
-      "Sara Hashemi presented “Tumor-Centric Deep Learning Framework for Survival Prediction in Multiphase DCE-MRI” in the Oncologic Imaging and Radiogenomics session at IEEE EMBC 2026 in Toronto, Ontario.",
+      "Tumor-Centric Deep Learning Framework for Survival Prediction in Multiphase DCE-MRI",
     date: "2026-07-28",
     category: "Presentation",
     href: "https://cmsworkshops.com/EMBC2026/view_paper.php?PaperNum=3915&SessionID=1029",
   },
   {
     /**
-     * Title, date, volume and issue verified against the journal.
-     * The title supplied read "...systems metabolomics GOT biomarker
-     * discovery"; the published title reads "...FOR biomarker discovery",
-     * which is what appears here. No publication date was supplied — the
-     * journal gives 15 July 2026.
+     * Heading and summary are the client's own wording, supplied 6 Aug 2026.
+     * The summary is the paper's subtitle verbatim — do not reword it. Date,
+     * volume and issue remain as verified against the journal: no publication
+     * date was ever supplied, and the journal gives 15 July 2026.
      */
     slug: "aisysmet-bioinformatics",
-    title:
-      "aiSysMet published in Bioinformatics: AI-powered systems metabolomics for biomarker discovery",
-    /**
-     * @verbatim — supplied by the client, adapted from the paper's own
-     * Results abstract. Do not reword; the wording of a published scientific
-     * claim is not a copy decision.
-     */
-    summary:
-      "aiSysMet is an AI-powered software platform that uses statistical, machine learning, and deep learning methods for metabolomics data processing, metabolite annotation, and integrative analysis of multi-omics data. The platform’s interactive and modular web interface allows users to easily build data analysis pipelines that can be executed in the cloud.",
+    title: "aiSysMet published in Bioinformatics",
+    summary: "AI-powered systems metabolomics for biomarker discovery",
     date: "2026-07-15",
     category: "Publication",
     /**
-     * Self-hosted PDF, at the client's request — "Read the paper" must serve
-     * the paper itself rather than send people to a third-party site.
+     * The publisher's own PDF, supplied by the client 6 Aug 2026, and now the
+     * single link on this entry.
      *
-     * Redistribution is permitted: the article is the company's own work and
-     * is Open Access under CC BY (confirmed via the NCBI OA service for
-     * PMC13412159), which allows reuse with attribution.
+     * It replaces an arrangement that self-hosted the PDF at
+     * `/papers/aisysmet-bioinformatics-2026.pdf` and fell back to the free PMC
+     * full text until that file was added — the file never was, so the link
+     * had been serving the fallback. Redistribution was permitted (the article
+     * is the company's own work, Open Access under CC BY), so self-hosting can
+     * be restored by putting the file back at that path and setting `href` and
+     * `hrefFallback` again; `news-list.tsx` still supports both.
      *
-     * The file is not in the repo yet — see `paperPdf` handling in
-     * `news-list.tsx`, which falls back to the free PMC full text until it is
-     * added at `public/papers/aisysmet-bioinformatics-2026.pdf`.
+     * `siteHref` is dropped with it: the client asked for one link, "Read the
+     * paper", so the featured card no longer carries a second "View on
+     * Bioinformatics" alongside it.
+     *
+     * NOTE: this URL opens the PDF in a new tab rather than downloading it —
+     * `download` is ignored cross-origin, and `news-list.tsx` labels the link
+     * accordingly.
      */
-    href: "/papers/aisysmet-bioinformatics-2026.pdf",
-    hrefFallback: "https://pmc.ncbi.nlm.nih.gov/articles/PMC13412159/",
-    siteHref:
-      "https://academic.oup.com/bioinformatics/article/42/7/btag520/8735226",
+    href: "https://academic.oup.com/bioinformatics/article-pdf/42/7/btag520/68969188/btag520.pdf",
     featured: true,
   },
   {

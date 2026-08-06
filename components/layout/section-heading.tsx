@@ -86,18 +86,24 @@ export function SectionHeading({
       {description ? (
         <p
           className={cn(
-            "type-lead measure",
-            // Without a title above it the description is the first real line
-            // of the page, so it carries a little more weight.
+            "type-lead",
+            // A 65ch measure is right for a description sitting under a
+            // display title — it is one element of a stack, and a long line
+            // there fights the title above it.
             //
-            // `text-balance` matters more here than it looks. At this size the
-            // 65ch measure cuts these one-sentence page intros a word or two
-            // early, dropping a lone trailing word onto line two — "…through
-            // biological / interpretation." That short second line reads as an
-            // indent or a new paragraph rather than a continuation, which is
-            // what the client saw on /services and /projects. Balancing splits
-            // the sentence across two even lines instead.
-            !hasTitle && "text-[1.15rem] text-balance sm:text-[1.25rem]",
+            // NOT for the titleless pages. There the description IS the
+            // header, a single short sentence set larger, and 65ch cut it a
+            // word or two early: /services broke after "workflow," and
+            // /projects after "Institutes", with a stub of a second line that
+            // read as a new paragraph rather than a continuation. An earlier
+            // pass added `text-balance` to even those two lines out, which
+            // treated the symptom — the client wants the sentence on one line,
+            // and at ~1000px it fits the container with room to spare on any
+            // desktop. So: no cap, no balancing, and it wraps only when the
+            // viewport genuinely runs out of room.
+            hasTitle
+              ? "measure"
+              : "text-[1.15rem] text-pretty sm:text-[1.25rem]",
             align === "center" && "mx-auto",
             onDark ? "text-slate-300" : "text-slate-600",
           )}

@@ -8,7 +8,6 @@ import {
   FlaskConical,
   GitMerge,
   Grid2x2Check,
-  Layers,
   ListOrdered,
   Ruler,
   ScanLine,
@@ -54,11 +53,19 @@ type Flow = {
 const FLOWS: Record<string, Flow> = {
   metcraft: {
     input: { label: "Raw metabolomics data", note: "LC-MS acquisition", icon: FlaskConical },
+    /* Three stages, not four. MetCraft's verbatim blurb lists normalization,
+       missing value imputation and batch correction (and closes with "etc."),
+       so the diagram was showing four while the other three tools showed
+       three — the client asked for the block counts to match across the row.
+       Batch correction is the one dropped: it is still named in the card's
+       copy directly above, so nothing is lost from the page, and it is the
+       stage that reads as a sub-step of processing rather than a stage of its
+       own. This is a diagram edit, NOT a copy edit — the blurb in
+       lib/content.ts is verbatim and stays as it is. */
     stages: [
       { label: "Peak detection", note: "feature extraction", icon: Waves },
       { label: "Normalization", note: "scale alignment", icon: SlidersHorizontal },
       { label: "Missing value imputation", note: "gap filling", icon: Grid2x2Check },
-      { label: "Batch correction", note: "cross-run alignment", icon: Layers },
     ],
     output: { label: "Analysis-ready matrix", note: "quantitative analysis", icon: FileStack },
   },

@@ -81,8 +81,12 @@ export function MottoStatement({ headline }: { headline: string }) {
           headline competing with the first.
 
           NO `text-balance` — see the note above. Balancing is what pulled the
-          lines short of the rule in the first place. */}
-      <p ref={ref} className="type-h3 mt-3.5 text-navy-900">
+          lines short of the rule in the first place.
+
+          No top margin: the caller owns the spacing above this, which since
+          the motto moved under the photograph is a gap from an image rather
+          than from an eyebrow. */}
+      <p ref={ref} className="type-h3 text-navy-900">
         {headline}
       </p>
 

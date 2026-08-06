@@ -9,10 +9,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
 import { GlowBackdrop } from "@/components/visuals/glow-backdrop";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
-import {
-  PIPELINE_RUN_MS,
-  PipelineDiagram,
-} from "@/components/visuals/pipeline-diagram";
+import { PipelineDiagram } from "@/components/visuals/pipeline-diagram";
 import { HERO, SLIDES } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -52,52 +49,68 @@ import { cn } from "@/lib/utils";
  */
 
 /* ── TIMING ────────────────────────────────────────────────────────────────
-   Slide 0 is not a fixed duration: it holds until the pipeline diagram inside
-   it has actually finished its run, then a beat longer. PIPELINE_RUN_MS is
-   four hand-offs at CYCLE_MS (2.6s) = 10.4s to get from 01/05 to 05/05, plus
-   1s to let 05 land = 11.4s.
+   One interval for every slide, at the client's direction. Two earlier
+   versions derived per-slide durations from the pipeline diagram's run length,
+   which is what left the carousel sitting on a slide for 10-11 seconds.
 
-   The six photographic slides then take that figure minus the one-second
-   beat — 10.4s — so the rotation keeps one cadence throughout instead of the
-   hero slide feeling like an outlier. Both derive from CYCLE_MS, so retiming
-   the pipeline retimes the carousel with it; do not hardcode either. */
-const HOLD_AFTER_PIPELINE_MS = 1000;
-const HERO_SLIDE_MS = PIPELINE_RUN_MS + HOLD_AFTER_PIPELINE_MS;
-const PHOTO_SLIDE_MS = HERO_SLIDE_MS - HOLD_AFTER_PIPELINE_MS;
+   THE ONE CONSTRAINT: slide 0's pipeline diagram has to reach 05/05 inside
+   this window, or the slide changes mid-run. It takes four hand-offs at
+   CYCLE_MS (pipeline-diagram.tsx) — 4.8s at the current 1200ms, comfortably
+   inside 6s. Raising CYCLE_MS past 1500 breaks that; raise this to match. */
+const SLIDE_MS = 6000;
 
 const TOTAL = SLIDES.length + 1;
 
 export function HeroCarousel() {
   const [index, setIndex] = useState(0);
-  // Direction drives which way slides travel; -1 when stepping backwards.
+  // Which way the slides travel; -1 when stepping backwards. Presentation
+  // only — it does not affect where the carousel goes next.
   const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
   const reduceMotion = useReducedMotion();
   const regionRef = useRef<HTMLElement>(null);
 
-  const go = useCallback((next: number, dir: number) => {
-    setDirection(dir);
-    // Wraps in both directions, so "previous" from slide 1 lands on slide 7.
-    setIndex(((next % TOTAL) + TOTAL) % TOTAL);
+  /**
+   * Step one slide. The ONLY way the index moves.
+   *
+   * The modulo wraps in both directions — TOTAL is added before it so a
+   * negative never reaches `%`, which in JS returns a negative — so slide 1
+   * steps back to slide 7 and slide 7 steps forward to slide 1 with no special
+   * cases anywhere.
+   *
+   * The functional update is what keeps this stable across renders: it reads
+   * no state, so it never changes identity, so the autoplay effect below is
+   * not torn down and rebuilt on every render.
+   */
+  const step = useCallback((delta: number) => {
+    setDirection(delta > 0 ? 1 : -1);
+    setIndex((current) => (current + delta + TOTAL) % TOTAL);
   }, []);
 
-  const next = useCallback(() => go(index + 1, 1), [go, index]);
-  const previous = useCallback(() => go(index - 1, -1), [go, index]);
+  const next = useCallback(() => step(1), [step]);
+  const previous = useCallback(() => step(-1), [step]);
 
-  // Autoplay. Reset on every index change — including a manual one — so
-  // stepping back to a slide gives it a full interval and the rotation carries
-  // on from there. (It used to stall instead: clicking an arrow focused the
-  // button, `onFocusCapture` latched `paused`, and nothing ever cleared it
-  // because focus never left the carousel. Focus now only pauses for keyboard
-  // users; see onFocusCapture.)
+  /**
+   * Autoplay: one timer, one direction, restarted from scratch on every slide
+   * change.
+   *
+   * `index` in the dependencies is the whole mechanism. Any change to it —
+   * autoplay's own, an arrow, a dot, a keypress — tears this effect down and
+   * starts a fresh SLIDE_MS timeout, so a manual step always buys a full
+   * interval on the slide it lands on. A timeout rather than an interval for
+   * the same reason: an interval would keep the original phase and could fire
+   * a moment after a click.
+   *
+   * (It used to stall here instead: clicking an arrow focused the button,
+   * `onFocusCapture` latched `paused`, and nothing ever cleared it because
+   * focus never left the carousel. Focus now only pauses for keyboard users;
+   * see onFocusCapture.)
+   */
   useEffect(() => {
     if (paused || reduceMotion) return;
-    const timer = window.setTimeout(
-      () => go(index + 1, 1),
-      index === 0 ? HERO_SLIDE_MS : PHOTO_SLIDE_MS,
-    );
+    const timer = window.setTimeout(() => step(1), SLIDE_MS);
     return () => window.clearTimeout(timer);
-  }, [index, paused, reduceMotion, go]);
+  }, [index, paused, reduceMotion, step]);
 
   // A background tab still fires timers; without this the carousel would be
   // several slides on by the time someone came back to it.
@@ -199,10 +212,10 @@ export function HeroCarousel() {
       </AnimatePresence>
 
       {/* ── Slide content ──────────────────────────────────────────────── */}
-      {/* The bottom padding clears the motto plaque, which rides up into this
-          section by -mt-16 / lg:-mt-24. Without it the plaque covers the
-          pagination dots. If that overlap changes, this has to change with
-          it. */}
+      {/* The generous bottom padding dates from when the motto plaque rode up
+          into this section and would otherwise have covered the pagination
+          dots. The plaque now sits fully in the band below (see
+          motto-band.tsx), so this is only breathing room under the controls. */}
       <Container className="relative flex flex-1 flex-col pb-24 pt-36 lg:pb-32 lg:pt-44">
         {/* A GRID STACK, NOT ABSOLUTE POSITIONING. Every slide occupies the
             same cell (col-start-1 row-start-1), so the row is as tall as the
@@ -211,7 +224,16 @@ export function HeroCarousel() {
             headline, subhead, two CTAs and the pipeline diagram stacked — is
             taller than on a phone, and centring inside it pushed the headline
             up under the header and the diagram down through the controls. */}
-        <div className="grid flex-1 items-center">
+        {/* EVERY SLIDE'S FIRST LINE STARTS ON THE SAME BASELINE, and it is
+            structural rather than a nudge. `content-center` sizes the single
+            row to the tallest slide (slide 0) and centres that row in the
+            available height; `items-start` then pins all seven to its top
+            edge. Slide 0's own columns are top-aligned too (see below), so its
+            h1 sits on that same edge — which is what the photographic slides'
+            headlines now line up with. Centring the items instead floated the
+            short slides in the middle of slide 0's height, leaving their
+            headlines ~100px below it. */}
+        <div className="grid flex-1 content-center items-start">
           {/* Heights never jump mid-rotation, because every slide is always
               laid out; only opacity changes. */}
           {Array.from({ length: TOTAL }, (_, position) => {
@@ -236,18 +258,19 @@ export function HeroCarousel() {
         </div>
 
         {/* ── Controls ─────────────────────────────────────────────────
-            Left-aligned rather than centred on the section's bottom edge: the
-            motto plaque below rides up over the middle of this section and
-            would sit on top of centred dots. */}
-        <div className="relative mt-10 flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <ArrowButton label="Previous slide" onClick={previous}>
-              <ChevronLeft className="size-5" aria-hidden />
-            </ArrowButton>
-            <ArrowButton label="Next slide" onClick={next}>
-              <ChevronRight className="size-5" aria-hidden />
-            </ArrowButton>
-          </div>
+            One centred group: [ < ] [ dots ] [ > ]. The arrows sit on either
+            side of the dots rather than paired off to one edge, and the
+            "01 / 07" counter is gone — the dots already say both where you are
+            and how many there are, so the readout was the same information a
+            second time.
+
+            Centred even though slide 0's copy is left-aligned: the group
+            belongs to the whole carousel, and slides 2-7 are centred title
+            cards, so the page's axis is the only mark all seven share. */}
+        <div className="relative mt-10 flex items-center justify-center gap-4 sm:gap-6">
+          <ArrowButton label="Previous slide" onClick={previous}>
+            <ChevronLeft className="size-5" aria-hidden />
+          </ArrowButton>
 
           <ul className="flex items-center gap-2.5">
             {Array.from({ length: TOTAL }, (_, position) => {
@@ -256,7 +279,12 @@ export function HeroCarousel() {
                 <li key={position}>
                   <button
                     type="button"
-                    onClick={() => go(position, position > index ? 1 : -1)}
+                    // A dot is a jump: `step` moves by a delta, so the delta to
+                    // this dot is what gets passed, and the wrap logic stays in
+                    // one place. Zero when it is already the current slide,
+                    // which is a no-op that still restarts the timer — the
+                    // same thing every other control does.
+                    onClick={() => step(position - index)}
                     aria-label={`Go to slide ${position + 1} of ${TOTAL}`}
                     aria-current={isCurrent ? "true" : undefined}
                     /* The dot is 8px, but the button is a 24px target — the
@@ -277,9 +305,9 @@ export function HeroCarousel() {
             })}
           </ul>
 
-          <span className="ml-auto hidden font-mono text-xs tabular-nums text-slate-400 sm:block">
-            {String(index + 1).padStart(2, "0")} / {String(TOTAL).padStart(2, "0")}
-          </span>
+          <ArrowButton label="Next slide" onClick={next}>
+            <ChevronRight className="size-5" aria-hidden />
+          </ArrowButton>
         </div>
       </Container>
     </section>
@@ -314,7 +342,13 @@ function SlidePanel({
       aria-label={`${position + 1} of ${TOTAL}`}
       aria-live={paused && isCurrent ? "polite" : "off"}
       className={cn(
-        "col-start-1 row-start-1 flex flex-col justify-center transition-opacity duration-500",
+        "col-start-1 row-start-1 flex flex-col transition-opacity duration-500",
+        // Slide 0 stays where the parent grid puts it: top of the row, so its
+        // h1 starts at the top of the section's content box. Slides 1-6 are
+        // title cards — `self-stretch` gives them slide 0's full height and
+        // `justify-center` centres them inside it, which is what puts the
+        // headline on the optical centre of the photograph behind it.
+        slide ? "self-stretch justify-center" : null,
         isCurrent ? "opacity-100" : "pointer-events-none opacity-0",
       )}
     >
@@ -329,14 +363,26 @@ function SlidePanel({
         transition={{ duration: reduceMotion ? 0 : 0.65, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           slide
-            ? "max-w-3xl"
-            : "grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-16",
+            ? // CINEMATIC TITLE CARD. These six slides are a headline and one
+              // line of subhead over a full-bleed photograph — left-aligning
+              // them the way slide 0 is left-aligned stranded two short lines
+              // against a very wide empty right-hand side, because there is no
+              // second column here to fill it. Centred, the photograph is the
+              // composition and the type sits on its axis.
+              "mx-auto max-w-4xl text-center"
+            : // items-start, not items-center: the pipeline column is the
+              // taller of the two, so centring dropped the h1 below the top of
+              // the row. Top-aligned, the headline starts where the section's
+              // content box does.
+              "grid items-start gap-14 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-16",
         )}
       >
         {slide ? (
           <>
             <h2 className="type-display text-white">{slide.headline}</h2>
-            <p className="type-lead measure mt-6 text-slate-200">
+            {/* mx-auto: `measure` caps this at 65ch, and without it the capped
+                box would sit hard left inside the centred column. */}
+            <p className="type-lead measure mx-auto mt-6 text-slate-200">
               {slide.subhead}
             </p>
           </>
@@ -344,8 +390,18 @@ function SlidePanel({
           <>
             <div>
               {/* The page's only h1. The other six slides carry h2s: they are
-                  peers within the carousel, not competing page titles. */}
-              <h1 className="type-display measure-tight text-white">
+                  peers within the carousel, not competing page titles.
+
+                  TRACKING AND LEADING ARE OVERRIDDEN HERE, not in
+                  `.type-display`. At the top of that class's clamp — 68px on a
+                  desktop, three lines deep — the shared setting read as
+                  cramped, with the lines almost touching. These two utilities
+                  open it up for this headline alone; every other display
+                  heading on the site keeps the tighter setting, which is
+                  correct for the one- and two-line cases they are. `.type-*`
+                  live in @layer components, so plain utilities win over them
+                  without an `!important`. */}
+              <h1 className="type-display measure-tight leading-[1.3] tracking-wide text-white">
                 {HERO.headline}
               </h1>
 

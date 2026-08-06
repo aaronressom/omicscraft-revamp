@@ -6,12 +6,24 @@ import { useReducedMotion } from "motion/react";
 import { PIPELINE_STAGES } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
-/** ms each stage holds before the trace steps on. Exported because the hero
- *  carousel times slide 0 off it: the slide has to stay up until the pathway
- *  has actually reached 05/05. Change this and the carousel follows. */
-export const CYCLE_MS = 2600;
+/** ms each stage holds before the trace steps on.
+ *
+ *  CEILING: 1500. The hero carousel gives every slide a flat 6s (SLIDE_MS in
+ *  hero-carousel.tsx) and the full run is four hand-offs — 4.8s here — so the
+ *  pathway reaches 05/05 with time to spare. Anything above 1500 would leave
+ *  slide 0 changing mid-run. Lowered from 2600 when the client asked for a
+ *  faster rotation; that setting put the run at 10.4s and dictated the whole
+ *  carousel's pace. */
+export const CYCLE_MS = 1200;
 
-/** Time from 01/05 to 05/05 — four hand-offs, not five. */
+/**
+ * Time from 01/05 to 05/05 — four hand-offs, not five.
+ *
+ * Nothing imports this any more: the carousel used to derive its slide
+ * durations from it and now runs a flat interval instead. Kept because it is
+ * the figure the CEILING above is about, and it stays correct on its own if
+ * either CYCLE_MS or the number of stages changes.
+ */
 export const PIPELINE_RUN_MS = (PIPELINE_STAGES.length - 1) * CYCLE_MS;
 
 /* Geometry. The bonds are drawn in one SVG laid over the node rail, and the
@@ -63,7 +75,7 @@ export function PipelineDiagram({
    * the pathway would keep stepping out of sight and be at some arbitrary
    * stage whenever slide 0 came back round. Gating it here means the run
    * always starts from 01/05 the moment the slide is shown — which is what
-   * makes the carousel's timing off PIPELINE_RUN_MS honest.
+   * lets the carousel assume the run fits inside one slide interval.
    *
    * To restart the run, remount with a changed React `key`; the carousel keys
    * this off its own slide timer so the two can never drift.
