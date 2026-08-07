@@ -1,32 +1,29 @@
-import Link from "next/link";
-
 import { Container } from "@/components/layout/container";
 import {
   SOCIAL_LABELS,
   SOCIAL_MARKS,
 } from "@/components/visuals/social-marks";
 import { Logo } from "@/components/layout/logo";
-import { FUNDERS, NAV, SITE } from "@/lib/content";
-
-const COMPANY_LINKS = [
-  { label: "About", href: "/about" },
-  { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/contact" },
-];
-
-const PLATFORM_LINKS = [
-  { label: "Software Platform", href: "/platform" },
-  { label: "Services", href: "/services" },
-];
+import { SITE } from "@/lib/content";
 
 /**
- * Footer links are standalone navigation, not inline-in-sentence links, so
- * WCAG 2.5.8 (AA) applies: the target must be at least 24x24 CSS px. Plain
- * text links measure ~17px tall, which fails. min-h-9 gives a comfortable
- * 36px without inflating the footer.
+ * Footer — one row: logo, copyright, social links.
+ *
+ * ── WHAT CAME OUT, AND WHY IT IS NOT COMING BACK ───────────────────────────
+ * This was a four-column block: the company description, a Platform column, a
+ * Company column, a Contact column with the full address, then a funding
+ * attribution strip, then the whole top navigation repeated a second time.
+ * The client's note was that it read as a wall of text, and every part of it
+ * appeared somewhere better on the site already — the nav is fixed to the top
+ * of every page, the address and email are the substance of /contact, and the
+ * NIH/NSF attribution now opens /projects, next to the awards it refers to.
+ *
+ * So the trim was deliberate, not incidental. If any of it returns, it should
+ * return because that information is genuinely missing elsewhere.
+ *
+ * ONE THING IS LOAD-BEARING: the copyright line. It is the only place on the
+ * site that names the legal entity.
  */
-const FOOTER_LINK_CLASS = "inline-flex min-h-9 w-fit items-center";
-
 export function Footer() {
   const socials = Object.entries(SITE.social).filter(
     ([, href]) => typeof href === "string" && href.length > 0,
@@ -34,50 +31,18 @@ export function Footer() {
 
   return (
     <footer className="on-dark border-t border-white/10 bg-navy-950">
-      <Container className="py-16 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
-          <div className="flex flex-col gap-4">
+      {/* py-8, down from py-16/20. At this height the footer is a rule under
+          the page rather than a section of its own, which is the point. */}
+      <Container className="py-8">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between sm:gap-8">
+          {/* Logo and copyright travel together: the mark identifies the
+              company, the line beneath it names the legal entity, and splitting
+              them across the row left the copyright orphaned in the middle. */}
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
             <Logo />
-            <p className="max-w-xs text-sm leading-relaxed text-slate-400">
-              {SITE.description}
+            <p className="text-center text-sm text-slate-500 sm:text-left">
+              © {SITE.copyrightYear} {SITE.legalName}. All rights reserved.
             </p>
-          </div>
-
-          <FooterColumn title="Platform" links={PLATFORM_LINKS} />
-          <FooterColumn title="Company" links={COMPANY_LINKS} />
-
-          <div className="flex flex-col gap-3">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-              Contact
-            </h2>
-            <address className="flex flex-col gap-1 text-sm not-italic text-slate-300">
-              <span className="mb-1">{SITE.address.full}</span>
-              <a
-                href={`mailto:${SITE.email}`}
-                className={FOOTER_LINK_CLASS + " text-cyan-400"}
-              >
-                {SITE.email}
-              </a>
-              <a
-                href={SITE.phoneHref}
-                className={FOOTER_LINK_CLASS + " text-cyan-400"}
-              >
-                {SITE.phone}
-              </a>
-            </address>
-          </div>
-        </div>
-
-        {/* Funding attribution - factual, and the same two agencies named on
-            the current site. Replace with official logo files when supplied. */}
-        <div className="mt-14 flex flex-col gap-6 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Research supported by
-            </span>
-            <span className="text-sm text-slate-400">
-              {FUNDERS.map((f) => f.name).join(" · ")}
-            </span>
           </div>
 
           {socials.length > 0 ? (
@@ -88,6 +53,8 @@ export function Footer() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    /* size-11 is a 44px target — these are now the only links
+                       in the footer, so they carry all of its tap area. */
                     className="inline-flex size-11 items-center justify-center rounded-xl text-slate-400 ring-1 ring-white/10 transition-colors hover:text-white hover:ring-white/25"
                   >
                     {/* Real glyph where we have one; the two-letter badge
@@ -110,55 +77,7 @@ export function Footer() {
             </ul>
           ) : null}
         </div>
-
-        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-500">
-            © {SITE.copyrightYear} {SITE.legalName}. All rights reserved.
-          </p>
-          <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-6 gap-y-2">
-              {NAV.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`${FOOTER_LINK_CLASS} text-sm text-slate-400 hover:text-white`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
       </Container>
     </footer>
-  );
-}
-
-function FooterColumn({
-  title,
-  links,
-}: {
-  title: string;
-  links: { label: string; href: string }[];
-}) {
-  return (
-    <div className="flex flex-col gap-3">
-      <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-        {title}
-      </h2>
-      <ul className="flex flex-col gap-0.5">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className={`${FOOTER_LINK_CLASS} text-sm text-slate-300 hover:text-white`}
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

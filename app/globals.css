@@ -153,6 +153,17 @@
     @apply border-border;
   }
 
+  :root {
+    /* The display size, published as a variable rather than living only inside
+       `.type-display` below. The hero carousel offsets its photographic slides
+       by exactly one line of this type so their headlines start on the hero
+       h1's SECOND line (see hero-carousel.tsx), and that arithmetic has to
+       follow the clamp rather than duplicate it — a copy here would drift the
+       moment the curve is retuned, and the slides would land a few pixels off
+       at every width. */
+    --type-display-size: clamp(2.6rem, 2.1rem + 1.55vw, 4.25rem);
+  }
+
   /* GLOBAL SCALE.
      The client reviews the site at 80% browser zoom and wants that density to
      be the default. Root font-size drives every rem in the design, so one
@@ -225,7 +236,8 @@
      letter-spacing further (which would only loosen the words themselves). */
   .type-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(2.6rem, 2.1rem + 1.55vw, 4.25rem);
+    /* Declared in @layer base above — see the note there before inlining it. */
+    font-size: var(--type-display-size);
     line-height: 1.18;
     letter-spacing: -0.005em;
     /* 0.03em, not 0.2em. This was raised to 0.2em when the headline was also

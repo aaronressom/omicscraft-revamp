@@ -85,8 +85,24 @@ export function MottoStatement({ headline }: { headline: string }) {
 
           No top margin: the caller owns the spacing above this, which since
           the motto moved under the photograph is a gap from an image rather
-          than from an eyebrow. */}
-      <p ref={ref} className="type-h3 text-navy-900">
+          than from an eyebrow.
+
+          ONE LINE FROM lg UP. At `.type-h3`'s full size the sentence ran about
+          5% wider than the plaque's interior and dropped "days!" onto a line
+          of its own. The size is trimmed rather than the card widened: the
+          card's width is what sets the photograph's, and that photograph is
+          already being upscaled past its source resolution (see
+          motto-band.tsx), so buying room for the type there would cost
+          sharpness.
+
+          Only from lg, and deliberately not with `whitespace-nowrap`. From lg
+          the plaque is pinned at max-w-3xl, so the width this has to fit into
+          is a constant and the size can be picked against it — about 10% of
+          slack at 1.5rem. Below lg the card tracks the viewport and the
+          sentence is meant to wrap. No nowrap because the failure mode matters:
+          if a future edit lengthens this sentence it should wrap, as it does
+          today, rather than run out through the side of the card. */}
+      <p ref={ref} className="type-h3 text-navy-900 lg:text-[1.5rem]">
         {headline}
       </p>
 

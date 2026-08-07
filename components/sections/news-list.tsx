@@ -8,7 +8,10 @@ import {
 
 import { Container } from "@/components/layout/container";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
-import { LinkedInMark } from "@/components/visuals/social-marks";
+import {
+  SOCIAL_LABELS,
+  SOCIAL_MARKS,
+} from "@/components/visuals/social-marks";
 import { publicAssetExists } from "@/lib/assets";
 import { SITE } from "@/lib/content";
 import {
@@ -31,6 +34,11 @@ import { cn } from "@/lib/utils";
 export function NewsList() {
   const featured = featuredNews();
   const rest = sortedNews().filter((item) => item.slug !== featured?.slug);
+  // Same filter the footer applies, so the two never disagree about which
+  // accounts exist. Key order in SITE.social is render order.
+  const socialLinks = Object.entries(SITE.social).filter(
+    ([, href]) => typeof href === "string" && href.length > 0,
+  ) as [string, string][];
 
   return (
     <section className="relative isolate overflow-hidden bg-surface-tint pb-20 pt-12 lg:pb-24 lg:pt-14">
@@ -56,10 +64,12 @@ export function NewsList() {
               {/* Sits as the last tile in the same grid rather than as a banner
                   below it: this page is a short list of occasional
                   announcements, and "the next one lands here" belongs at the
-                  end of that list, in the same shape as the cards it follows. */}
-              {SITE.social.linkedin ? (
+                  end of that list, in the same shape as the cards it follows.
+                  Renders only while at least one account is set — an empty
+                  "follow us" card is worse than none. */}
+              {socialLinks.length > 0 ? (
                 <li>
-                  <FollowCard href={SITE.social.linkedin} />
+                  <FollowCard links={socialLinks} />
                 </li>
               ) : null}
             </ul>
@@ -200,45 +210,67 @@ function NewsCard({ item }: { item: NewsItem }) {
 }
 
 /**
- * "Follow on LinkedIn" tile, closing the announcements grid.
+ * "Follow OmicsCraft" tile, closing the announcements grid.
  *
- * Deliberately styled as the inverse of a news card — dark where they are
- * white — so it reads as an action rather than as another announcement someone
- * might mistake for a dated item.
+ * It was a single LinkedIn card on a navy panel. Now that there are three
+ * accounts it is one card carrying all three, on the pale cyan the client
+ * asked for — the tile stops being the inverse of a news card and becomes the
+ * one coloured thing on a page of white ones, which is a better way to mark it
+ * as an action rather than another dated announcement.
  *
- * The whole tile is one anchor, so the target is the full card rather than a
- * small link inside it.
+ * NOT ONE ANCHOR ANY MORE. The old tile was a single link wrapping the whole
+ * card, which is the right shape when there is one destination and the wrong
+ * one when there are three — nesting three anchors inside a fourth is invalid,
+ * and the outer one would swallow their clicks. The card is a plain container
+ * and each network is its own button-sized link.
+ *
+ * CONTRAST. Navy-900 text on cyan-500/12 over white measures ~13:1, and the
+ * cyan-ink labels under the icons ~5.5:1 — both past AA at these sizes. Do not
+ * deepen the tint without re-checking the labels; this palette's cyan goes
+ * illegible against navy type quickly.
  */
-function FollowCard({ href }: { href: string }) {
+function FollowCard({ links }: { links: [string, string][] }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex h-full flex-col justify-between rounded-2xl border border-navy-800 bg-navy-900 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-lg hover:shadow-navy-950/20"
-    >
+    <div className="flex h-full flex-col justify-between rounded-2xl border border-cyan-500/30 bg-cyan-500/[0.12] p-6">
       <div>
-        <span className="inline-flex size-10 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-400/25">
-          <LinkedInMark className="size-4.5" />
-        </span>
-
-        <h3 className="font-display mt-4 text-base font-semibold leading-snug tracking-tight text-white">
-          Follow OmicsCraft on LinkedIn
+        <h3 className="font-display text-base font-semibold leading-snug tracking-tight text-navy-900">
+          Follow OmicsCraft
         </h3>
-        <p className="mt-2 text-[0.925rem] leading-relaxed text-slate-400">
-          Papers, presentations and platform releases land there first.
+        <p className="mt-2 text-[0.925rem] leading-relaxed text-slate-700">
+          Papers, presentations and platform releases land here first.
         </p>
       </div>
 
-      <span className="mt-5 inline-flex min-h-9 items-center gap-1.5 border-t border-white/10 pt-4 text-[0.8rem] font-semibold text-cyan-300">
-        Open LinkedIn
-        <ArrowUpRight
-          className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-          aria-hidden
-        />
-        <span className="sr-only"> (opens in new tab)</span>
-      </span>
-    </a>
+      <ul className="mt-5 flex items-center gap-2.5 border-t border-cyan-ink/15 pt-4">
+        {links.map(([network, href]) => {
+          const Mark = SOCIAL_MARKS[network];
+          const label = SOCIAL_LABELS[network] ?? network;
+          return (
+            <li key={network}>
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                /* 44px target, and the white tile is what separates the marks
+                   from the tinted card behind them. */
+                className="inline-flex size-11 items-center justify-center rounded-xl bg-white text-cyan-ink ring-1 ring-cyan-ink/15 transition-all hover:-translate-y-0.5 hover:text-navy-900 hover:ring-cyan-ink/40"
+              >
+                {Mark ? (
+                  <Mark className="size-4.5" />
+                ) : (
+                  <span className="text-sm font-semibold capitalize">
+                    {network.slice(0, 2)}
+                  </span>
+                )}
+                <span className="sr-only">
+                  {SITE.name} on {label} (opens in new tab)
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 

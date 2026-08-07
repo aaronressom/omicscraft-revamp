@@ -120,7 +120,18 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* h-11 keeps the header CTA at a 44px tap target. */}
+            {/* THIS IS THE SITE'S ONLY CONTACT LINK IN THE HEADER. The nav no
+                longer carries a Contact entry (see NAV in lib/content.ts) —
+                the two sat inches apart pointing at the same page, so the
+                button now owns that route outright rather than competing with
+                a text link for it.
+
+                Which means the label has to be plain. "Book a demo" read as a
+                different, narrower offer; this is the general way in.
+
+                Consequence to keep in mind: on desktop, removing this button
+                removes the only route to /contact from the header. h-11 keeps
+                it at a 44px tap target. */}
             <ButtonLink
               href="/contact"
               className="hidden h-11 rounded-xl px-5 text-sm font-semibold lg:inline-flex"

@@ -23,7 +23,13 @@ import { SITE } from "@/lib/content";
  */
 export function ContactSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-surface-tint py-24 lg:py-32">
+    /* Top padding matches the first section of every other route — services,
+       projects, team and news all open at pt-14 / lg:pt-16 under their page
+       hero. This section was on a symmetric py-24 / lg:py-32, which put nearly
+       twice the gap under the hero here as anywhere else and made the page
+       look like it started late. The bottom keeps the larger value: it is the
+       last thing before the footer, not a seam between two sections. */
+    <section className="relative isolate overflow-hidden bg-surface-tint pb-24 pt-14 lg:pb-32 lg:pt-16">
       <MolecularBackdrop variant="light" subtle pattern={1} />
 
       <Container className="relative">

@@ -9,6 +9,15 @@ type Props = {
   title?: string | null;
   description?: string | null;
   align?: "left" | "center";
+  /**
+   * Bumps a titleless eyebrow up a step in size. For a section whose eyebrow
+   * is its heading with no description under it — /about's Team block is the
+   * only one — where the standard small-caps line is dwarfed by the content
+   * below it and reads as a label rather than as the section's title. Ignored
+   * when a `title` is present; there the eyebrow is decorative and must stay
+   * subordinate to it.
+   */
+  emphasizeEyebrow?: boolean;
   /** Set on dark sections so the eyebrow/description pick legible tones. */
   onDark?: boolean;
   className?: string;
@@ -32,6 +41,7 @@ export function SectionHeading({
   title,
   description,
   align = "left",
+  emphasizeEyebrow = false,
   onDark = false,
   className,
   as: Tag = "h2",
@@ -56,7 +66,9 @@ export function SectionHeading({
             // touch more presence without becoming a replacement title.
             hasTitle
               ? "text-sm tracking-[0.14em]"
-              : "text-base tracking-[0.16em] sm:text-[1.05rem]",
+              : emphasizeEyebrow
+                ? "text-lg tracking-[0.16em] sm:text-[1.35rem]"
+                : "text-base tracking-[0.16em] sm:text-[1.05rem]",
             onDark ? "text-cyan-400" : "text-cyan-ink",
           )}
         >

@@ -22,11 +22,41 @@ export function LinkedInMark({ className }: { className?: string }) {
   );
 }
 
+export function XMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      className={className}
+    >
+      {/* The post-2023 mark. Not a bird: the account is x.com/omicscraft, and
+          a Twitter bird next to that URL would be the wrong brand. */}
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+    </svg>
+  );
+}
+
+export function FacebookMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      className={className}
+    >
+      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+    </svg>
+  );
+}
+
 export const SOCIAL_MARKS: Record<
   string,
   (props: { className?: string }) => React.ReactElement
 > = {
   linkedin: LinkedInMark,
+  twitter: XMark,
+  facebook: FacebookMark,
 };
 
 /** Display name for a network key — "linkedin" reads badly in a label. */

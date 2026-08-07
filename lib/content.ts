@@ -40,21 +40,38 @@ export const SITE = {
   /** Google Maps place query - used by the click-to-load embed. */
   mapQuery: "OmicsCraft LLC, 1305 30th St NW %23105, Washington, DC 20007",
   copyrightYear: 2026,
-  /** TODO(client): supply real profile URLs, or these render disabled. */
+  /**
+   * All three supplied by the client. KEY ORDER IS RENDER ORDER — the footer
+   * and the news card both iterate this object, so LinkedIn stays first.
+   *
+   * `twitter` keeps its key: it is what `SOCIAL_MARKS` and `SOCIAL_LABELS` in
+   * social-marks.tsx are keyed on, and the label there already renders it as
+   * "X". Setting any of these back to null removes the icon everywhere with no
+   * component change.
+   */
   social: {
     linkedin: "https://www.linkedin.com/company/omicscraft/" as string | null,
-    facebook: null as string | null,
-    twitter: null as string | null,
+    twitter: "https://x.com/omicscraft" as string | null,
+    facebook: "https://www.facebook.com/OmicsCraft" as string | null,
   },
 } as const;
 
+/**
+ * Top navigation.
+ *
+ * NO CONTACT ENTRY — that is the header's "Get in touch" button, which is
+ * bigger, is the only filled element up there, and points at the same page.
+ * Listing it twice split the emphasis between them. /contact is still a real
+ * route and still linked from the hero's secondary CTA; it just is not in this
+ * list. Anything added here appears in both the desktop nav and the mobile
+ * drawer.
+ */
 export const NAV = [
   { label: "Software Platform", href: "/platform" },
   { label: "Services", href: "/services" },
   { label: "Projects", href: "/projects" },
   { label: "News", href: "/news" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
 ] as const;
 
 /* -------------------------------------------------------------------------- */
@@ -191,6 +208,34 @@ export const MOTTO = {
    * this string as verified copy or reuse the figure elsewhere on the site.
    */
   headline: "Reduce biomarker discovery time from months to days!",
+  /**
+   * Mission, Value and Product — @verbatim from the client's own slide,
+   * supplied 6 Aug 2026 as an image and transcribed exactly, including the
+   * missing full stops on Value and Product and the ampersand in "platform &
+   * service". Do not tidy the punctuation: it is the company's statement of
+   * what it is, not copy written for this site.
+   *
+   * Rendered as the three feeds converging on the aim below them — see
+   * `motto-band.tsx`. Adding a fourth entry changes that diagram's geometry;
+   * the connector is built for three.
+   */
+  pillars: [
+    {
+      id: "mission",
+      label: "Mission",
+      body: "Become the leading AI platform for quick and cost-effective biomarker discovery.",
+    },
+    {
+      id: "value",
+      label: "Value",
+      body: "Accelerate the time from data acquisition to biomarker discovery",
+    },
+    {
+      id: "product",
+      label: "Product",
+      body: "AI-powered platform & service for biomedical data analytics",
+    },
+  ],
   /**
    * Decorative only — never captioned as OmicsCraft's own lab or staff.
    *
@@ -556,7 +601,12 @@ export const HEADINGS = {
   },
   team: {
     eyebrow: "Team",
-    title: "Bioinformaticians, engineers, and data scientists",
+    /* Title dropped at the client's request — "Bioinformaticians, engineers,
+       and data scientists" restated the Who We Are block a screen above it,
+       almost word for word. With no title, SectionHeading promotes the eyebrow
+       to the section's heading element (see that file); `emphasizeEyebrow` in
+       team-grid.tsx is what gives it the size the title used to carry. */
+    title: null,
     description: null,
   },
   news: {

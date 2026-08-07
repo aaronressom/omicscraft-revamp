@@ -38,9 +38,15 @@ export function TeamGrid() {
       <MolecularBackdrop variant="light" subtle pattern={6} />
 
       <Container className="relative">
+        {/* Titleless since the client dropped "Bioinformaticians, engineers,
+            and data scientists" — it repeated the Who We Are block a screen
+            above. `emphasizeEyebrow` gives "Team" the presence the title used
+            to carry, so the section still announces itself above seven cards
+            rather than opening on a small caps label. */}
         <SectionHeading
           eyebrow={HEADINGS.team.eyebrow}
           title={HEADINGS.team.title}
+          emphasizeEyebrow
         />
 
         {/* Flex-wrap with explicit widths rather than a CSS grid.

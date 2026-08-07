@@ -36,10 +36,21 @@ import { cn } from "@/lib/utils";
  * file. Do not lighten the scrim without re-measuring all seven.
  *
  * ── MOTION ─────────────────────────────────────────────────────────────────
- * Autoplay stops entirely under prefers-reduced-motion, and pauses on hover,
- * on keyboard focus, and while the tab is hidden. A carousel that keeps moving
- * while someone is reading it is the single most common complaint about the
- * pattern.
+ * Autoplay stops entirely under prefers-reduced-motion, pauses for keyboard
+ * users while focus is inside it, and pauses while the tab is hidden.
+ *
+ * IT DOES NOT PAUSE ON HOVER — deliberately, after two rounds of the client
+ * reporting the carousel as broken. This section is the full height of the
+ * viewport, so the pointer is inside it from the moment the page loads: the
+ * hover pause fired before anyone had done anything, and the rotation never
+ * started. The same flag was what froze it after a click on an arrow, since
+ * the pointer necessarily sits inside the carousel then too. A hover pause is
+ * the textbook courtesy for this pattern and it is genuinely useful on a
+ * narrow strip; on a full-bleed hero it means "paused, always".
+ *
+ * What replaces it for anyone who needs the motion to stop: reduced-motion
+ * (which disables autoplay outright), keyboard focus, and seven dots plus two
+ * arrows that put the reader in charge of which slide is up.
  *
  * ── ACCESSIBILITY ──────────────────────────────────────────────────────────
  * Inactive slides are `inert`, so slide 0's two CTAs cannot be tabbed to while
@@ -59,6 +70,22 @@ import { cn } from "@/lib/utils";
    inside 6s. Raising CYCLE_MS past 1500 breaks that; raise this to match. */
 const SLIDE_MS = 6000;
 
+/**
+ * Line height of the hero h1, and the unit slides 1-6 are dropped by.
+ *
+ * ONE CONSTANT, TWO PLACES, ON PURPOSE. The h1 sets its leading from this, and
+ * the photographic slides pad their top by exactly one line of it so their
+ * headline starts on the h1's SECOND line — level with "metabolomics", not
+ * with "From raw". Top-aligned against a three-line headline they read as
+ * floating too high; a full line down, they sit where the eye has already
+ * been. Hardcoding 1.3 in both places would let them drift apart silently.
+ *
+ * The font size comes from `--type-display-size` (globals.css) so the offset
+ * tracks the fluid clamp at every viewport width instead of being right at one.
+ */
+const HERO_LEADING = 1.3;
+const PHOTO_SLIDE_OFFSET = `calc(${HERO_LEADING} * var(--type-display-size))`;
+
 const TOTAL = SLIDES.length + 1;
 
 export function HeroCarousel() {
@@ -66,7 +93,18 @@ export function HeroCarousel() {
   // Which way the slides travel; -1 when stepping backwards. Presentation
   // only — it does not affect where the carousel goes next.
   const [direction, setDirection] = useState(1);
-  const [paused, setPaused] = useState(false);
+  /**
+   * TWO SEPARATE REASONS TO PAUSE, not one flag.
+   *
+   * They were one boolean set by focus, by the tab going away and (until the
+   * hover pause was dropped — see the header) by the pointer, each clearing
+   * whatever the others had set. Coming back to the tab could therefore
+   * release a focus pause that was still legitimately in force. Kept apart,
+   * each reason clears only itself.
+   */
+  const [focusPaused, setFocusPaused] = useState(false);
+  const [tabHidden, setTabHidden] = useState(false);
+  const paused = focusPaused || tabHidden;
   const reduceMotion = useReducedMotion();
   const regionRef = useRef<HTMLElement>(null);
 
@@ -100,11 +138,6 @@ export function HeroCarousel() {
    * interval on the slide it lands on. A timeout rather than an interval for
    * the same reason: an interval would keep the original phase and could fire
    * a moment after a click.
-   *
-   * (It used to stall here instead: clicking an arrow focused the button,
-   * `onFocusCapture` latched `paused`, and nothing ever cleared it because
-   * focus never left the carousel. Focus now only pauses for keyboard users;
-   * see onFocusCapture.)
    */
   useEffect(() => {
     if (paused || reduceMotion) return;
@@ -113,9 +146,11 @@ export function HeroCarousel() {
   }, [index, paused, reduceMotion, step]);
 
   // A background tab still fires timers; without this the carousel would be
-  // several slides on by the time someone came back to it.
+  // several slides on by the time someone came back to it. Its own flag, so
+  // coming back to the tab cannot clear a hover or focus pause that is still
+  // legitimately in force.
   useEffect(() => {
-    const onVisibility = () => setPaused(document.hidden);
+    const onVisibility = () => setTabHidden(document.hidden);
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
@@ -140,21 +175,21 @@ export function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="OmicsCraft highlights"
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      // No onMouseEnter/onMouseLeave pause here. See the header — on a
+      // full-height hero it fired before the first slide had ever advanced.
       onFocusCapture={(event) => {
         // Keyboard focus only. A plain click on the prev/next buttons also
-        // focuses them, and pausing on that left the carousel stopped for
-        // good — the user's click meant "show me that slide", not "stop".
-        // :focus-visible is the browser's own read of keyboard vs pointer.
+        // focuses them, and pausing on that would stop the carousel on a
+        // gesture that meant "show me the next slide". :focus-visible is the
+        // browser's own read of keyboard vs pointer.
         const target = event.target as Element;
-        if (target.matches?.(":focus-visible")) setPaused(true);
+        if (target.matches?.(":focus-visible")) setFocusPaused(true);
       }}
       onBlurCapture={(event) => {
         // Only resume when focus actually leaves the carousel, not when it
         // moves between the controls inside it.
         if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-          setPaused(false);
+          setFocusPaused(false);
         }
       }}
       className="on-dark relative isolate flex min-h-[44rem] flex-col overflow-hidden bg-navy-950 lg:min-h-[48rem]"
@@ -258,16 +293,16 @@ export function HeroCarousel() {
         </div>
 
         {/* ── Controls ─────────────────────────────────────────────────
-            One centred group: [ < ] [ dots ] [ > ]. The arrows sit on either
-            side of the dots rather than paired off to one edge, and the
+            One group, left-aligned: [ < ] [ dots ] [ > ]. The arrows sit
+            either side of the dots rather than paired off to one end, and the
             "01 / 07" counter is gone — the dots already say both where you are
             and how many there are, so the readout was the same information a
             second time.
 
-            Centred even though slide 0's copy is left-aligned: the group
-            belongs to the whole carousel, and slides 2-7 are centred title
-            cards, so the page's axis is the only mark all seven share. */}
-        <div className="relative mt-10 flex items-center justify-center gap-4 sm:gap-6">
+            Left, not centred: every slide's copy starts on this edge, so the
+            controls line up under the text they belong to rather than floating
+            on an axis nothing else uses. */}
+        <div className="relative mt-10 flex items-center justify-start gap-4 sm:gap-6">
           <ArrowButton label="Previous slide" onClick={previous}>
             <ChevronLeft className="size-5" aria-hidden />
           </ArrowButton>
@@ -342,15 +377,14 @@ function SlidePanel({
       aria-label={`${position + 1} of ${TOTAL}`}
       aria-live={paused && isCurrent ? "polite" : "off"}
       className={cn(
+        // Every panel sits at the top of the shared row; the photographic ones
+        // then pad down by one line of the hero headline, so all seven slides
+        // start on the h1's second line rather than its first. See
+        // PHOTO_SLIDE_OFFSET.
         "col-start-1 row-start-1 flex flex-col transition-opacity duration-500",
-        // Slide 0 stays where the parent grid puts it: top of the row, so its
-        // h1 starts at the top of the section's content box. Slides 1-6 are
-        // title cards — `self-stretch` gives them slide 0's full height and
-        // `justify-center` centres them inside it, which is what puts the
-        // headline on the optical centre of the photograph behind it.
-        slide ? "self-stretch justify-center" : null,
         isCurrent ? "opacity-100" : "pointer-events-none opacity-0",
       )}
+      style={slide ? { paddingTop: PHOTO_SLIDE_OFFSET } : undefined}
     >
       <motion.div
         // Keyed on isCurrent so the entrance replays each time the slide comes
@@ -363,13 +397,10 @@ function SlidePanel({
         transition={{ duration: reduceMotion ? 0 : 0.65, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           slide
-            ? // CINEMATIC TITLE CARD. These six slides are a headline and one
-              // line of subhead over a full-bleed photograph — left-aligning
-              // them the way slide 0 is left-aligned stranded two short lines
-              // against a very wide empty right-hand side, because there is no
-              // second column here to fill it. Centred, the photograph is the
-              // composition and the type sits on its axis.
-              "mx-auto max-w-4xl text-center"
+            ? // Left-aligned on the same edge as slide 0's h1, and capped at
+              // the same measure. One format across all seven slides, at the
+              // client's direction.
+              "max-w-3xl"
             : // items-start, not items-center: the pipeline column is the
               // taller of the two, so centring dropped the h1 below the top of
               // the row. Top-aligned, the headline starts where the section's
@@ -380,9 +411,7 @@ function SlidePanel({
         {slide ? (
           <>
             <h2 className="type-display text-white">{slide.headline}</h2>
-            {/* mx-auto: `measure` caps this at 65ch, and without it the capped
-                box would sit hard left inside the centred column. */}
-            <p className="type-lead measure mx-auto mt-6 text-slate-200">
+            <p className="type-lead measure mt-6 text-slate-200">
               {slide.subhead}
             </p>
           </>
@@ -392,16 +421,28 @@ function SlidePanel({
               {/* The page's only h1. The other six slides carry h2s: they are
                   peers within the carousel, not competing page titles.
 
-                  TRACKING AND LEADING ARE OVERRIDDEN HERE, not in
-                  `.type-display`. At the top of that class's clamp — 68px on a
-                  desktop, three lines deep — the shared setting read as
-                  cramped, with the lines almost touching. These two utilities
-                  open it up for this headline alone; every other display
-                  heading on the site keeps the tighter setting, which is
-                  correct for the one- and two-line cases they are. `.type-*`
-                  live in @layer components, so plain utilities win over them
-                  without an `!important`. */}
-              <h1 className="type-display measure-tight leading-[1.3] tracking-wide text-white">
+                  SPACING IS OVERRIDDEN HERE, not in `.type-display`, because
+                  it is this headline that needs it: three lines at the top of
+                  that class's clamp (68px), where the shared setting reads as
+                  cramped. Every other display heading on the site is one or
+                  two lines and keeps the tighter default.
+
+                  WORD SPACING, NOT LETTER SPACING. An earlier pass added
+                  `tracking-wide` here, which pushed the letters inside each
+                  word apart as well as the words — so the words themselves got
+                  wider and the gaps between them stayed proportionally just as
+                  tight. The tracking is back to `.type-display`'s own
+                  -0.005em; only the word gaps are opened, and inline because
+                  there is no Tailwind utility for word-spacing.
+
+                  The leading is set from HERO_LEADING rather than a Tailwind
+                  class because the photographic slides offset themselves by
+                  exactly one line of it — the two must not be able to
+                  disagree. */}
+              <h1
+                className="type-display measure-tight text-white"
+                style={{ lineHeight: HERO_LEADING, wordSpacing: "0.15em" }}
+              >
                 {HERO.headline}
               </h1>
 
