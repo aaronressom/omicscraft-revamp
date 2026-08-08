@@ -414,6 +414,19 @@ function SlidePanel({
             <p className="type-lead measure mt-6 text-slate-200">
               {slide.subhead}
             </p>
+            {/* The same two CTAs slide 0 carries. They used to appear only
+                there, which meant that for six sevenths of the rotation the
+                page's primary actions were not on screen at all — the carousel
+                was spending most of its time showing copy with nowhere to go.
+
+                Each slide keeps its own subhead above them rather than
+                repeating slide 0's: that line is what the slide is about, and
+                two paragraphs stacked would read as a duplicate.
+
+                Duplicating the links across seven panels is safe because the
+                panels that are not showing are `inert` (see below) — only the
+                visible pair is focusable or in the accessibility tree. */}
+            <HeroCtas />
           </>
         ) : (
           <>
@@ -450,20 +463,7 @@ function SlidePanel({
                 {HERO.subhead}
               </p>
 
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <ButtonLink size="xl" href={HERO.primaryCta.href}>
-                  {HERO.primaryCta.label}
-                  <ArrowRight aria-hidden />
-                </ButtonLink>
-                <ButtonLink
-                  size="xl"
-                  variant="outline"
-                  className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                  href={HERO.secondaryCta.href}
-                >
-                  {HERO.secondaryCta.label}
-                </ButtonLink>
-              </div>
+              <HeroCtas />
             </div>
 
             {/* Every slide stays mounted (see the grid note above), so the
@@ -474,6 +474,32 @@ function SlidePanel({
           </>
         )}
       </motion.div>
+    </div>
+  );
+}
+
+/**
+ * The hero's two calls to action, on every slide.
+ *
+ * One component rather than a copy per branch: they are the same two links to
+ * the same two routes, and the moment they are duplicated in source someone
+ * will change one and not the other.
+ */
+function HeroCtas() {
+  return (
+    <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <ButtonLink size="xl" href={HERO.primaryCta.href}>
+        {HERO.primaryCta.label}
+        <ArrowRight aria-hidden />
+      </ButtonLink>
+      <ButtonLink
+        size="xl"
+        variant="outline"
+        className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+        href={HERO.secondaryCta.href}
+      >
+        {HERO.secondaryCta.label}
+      </ButtonLink>
     </div>
   );
 }

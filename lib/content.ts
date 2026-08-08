@@ -80,7 +80,7 @@ export const NAV = [
 
 export const HERO = {
   eyebrow: "NIH & NSF SBIR-funded",
-  headline: "From raw metabolomics data to biomarker discovery",
+  headline: "From raw metabolomics data to biomarker discovery",
   subhead:
     "AI-powered bioinformatics tools and expert services that compress the path from data acquisition to discovery.",
   primaryCta: { label: "Explore aiSysMet", href: "/platform" },
@@ -512,6 +512,18 @@ export type Project = {
   subtitle: string;
   phase: "Phase I" | "Phase II";
   abstract: string;
+  /**
+   * The award's public record — NIH RePORTER or NSF Award Search, supplied by
+   * the client 7 Aug 2026. This is the primary source for every claim on the
+   * page: the phase, the abstract and the funder all come from these records,
+   * so a reader can check any of them.
+   *
+   * The AGENCY IS DERIVED FROM THE HOSTNAME at render time rather than stored
+   * beside the URL — see `awardSource` in projects-list.tsx. A separate field
+   * could disagree with the link it labels, and a link that names the wrong
+   * agency is worse than one that names none.
+   */
+  awardHref: string;
 };
 
 export const PROJECTS: Project[] = [
@@ -520,6 +532,8 @@ export const PROJECTS: Project[] = [
     name: "aiSysMet",
     subtitle: "AI-Powered Platform for Integrative Analysis of Multimodal Data",
     phase: "Phase II",
+    awardHref:
+      "https://reporter.nih.gov/search/pTsIyY4JAkatFqdNVlsDNg/project-details/11196862",
     /** @verbatim */
     abstract:
       "Recent advances in cloud-based resources and technologies for imaging and multi-omics analysis have created new opportunities for exploring relationships between medical images, molecular events, and clinical outcomes using quantitative methods. However, the unprecedented scale and complexity of imaging and multi-omics data have presented critical computational bottlenecks requiring new concepts and enabling tools. The objective of this proposal is to address the computational challenges in integrative analysis of imaging and multi-omics data from The Cancer Genome Atlas (TCGA), Clinical Proteomic Tumor Analysis Consortium (CPTAC), and The Cancer Imaging Archive (TCIA) via an innovative AI-powered, scalable, and cloud-based data analytics platform to fully unlock the potential of the Cancer Research Data Commons (CRDC). This will be accomplished by building a computational framework that integrates novel data analysis algorithms including deep learning into a cloud-based platform for revealing complex relationships between medical images, multi-omics, and phenotypic outcomes. This project not only facilitates the development of new data analysis techniques, but also addresses emerging scientific questions in cancer research via a cloud-based data analytics pipeline that consists of innovative modules interfaced with CRDC. The proposed computational methods and pipeline are expected to impact cancer research and enable investigators to effectively test their scientific hypothesis.",
@@ -529,6 +543,8 @@ export const PROJECTS: Project[] = [
     name: "MetaboQuest",
     subtitle: "A Suite of Tools for Metabolite Annotation",
     phase: "Phase II",
+    awardHref:
+      "https://reporter.nih.gov/search/kMNicA378EinlzyLdPhgZA/project-details/10395223",
     /** @verbatim */
     abstract:
       "The goal of this Phase II SBIR proposal is to make metabolomics studies on a par with other omics studies such as genomics, transcriptomics, and proteomics, for which well-established pipelines are available. By doing so, we will accelerate the role of metabolomics in systems biology approaches for various applications including biomarker and drug discovery. To achieve this goal, we propose to develop a cloud-based platform that allows customers to build pipelines for analysis of LC-MS-based untargeted metabolomics data, starting from peak detection to metabolite annotation. This will be accomplished by implementing a suite of innovative tools that can be assembled into customized pipelines and by enhancing metabolite annotation accuracy through integration of information derived from multiple resources including compound databases, pathways, biochemical networks, and mass spectral libraries. Successful implementation and validation of MetaboQuest will contribute to addressing the major bottleneck in metabolomics - metabolite identification, thereby eliminating the need for manual verification of putative metabolite IDs and enhancing the contribution of metabolomics studies, specifically in disease biomarker and drug discovery.",
@@ -538,6 +554,9 @@ export const PROJECTS: Project[] = [
     name: "MetCraft",
     subtitle: "Pipeline for Analysis of Metabolomics Data",
     phase: "Phase I",
+    /* The one NSF award of the six; every other link is NIH RePORTER. */
+    awardHref:
+      "https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2126918&HistoricalAwards=false",
     /** @verbatim */
     abstract:
       "The broader impact of this Small Business Innovation Research (SBIR) Phase I project is enhancing the role of metabolite (substances used by cells for growth, reproduction and health) analysis in the growing area of systems biology research. This is expected to lead to faster and less expensive biomarker and drug discovery to allow for more accurate, reproducible, and faster clinical trials, and to accelerate basic scientific research into many areas of cellular and system-wide organismal studies. This will have a significant impact on the bottom line for drug companies and for improving health and reducing health care cost. The innovation will provide customers with a platform and expertise that enable them to increase their ability to develop biomarkers and drugs faster by: (1) allowing more metabolites to be involved in the discovery of new relationships between diseases and metabolites, potentially opening up new areas of basic research; (2) selecting disease-associated metabolites on the basis of not only statistically significant changes in metabolite levels but also correlations of interactions among metabolites in diseased vs. healthy cells; and (3) evaluating the relationships between metabolites and diseases through integration of metabolite analysis with other system-wide analytical methods (i.e. gene expression, protein levels, etc.).",
@@ -548,6 +567,8 @@ export const PROJECTS: Project[] = [
     subtitle:
       "A Cloud-Based Pipeline for Integrative Analysis of Multi-Omics and Imaging Data",
     phase: "Phase I",
+    awardHref:
+      "https://reporter.nih.gov/search/4sgZv1usDkqZksa6fEQ53w/project-details/10489550",
     /** @verbatim */
     abstract:
       "Recent advances in cloud-based resources and technologies for multi-omics and imaging analysis have created new opportunities for exploring relationships between histology, molecular events, and clinical outcomes using quantitative methods. However, the unprecedented scale and complexity of multi-omics and imaging data have presented critical computational bottlenecks requiring new concepts and enabling tools. The objective of this proposal is to address the computational challenges in integrative analysis of multi-omics and imaging data from The Cancer Genome Atlas (TCGA), Clinical Proteomic Tumor Analysis Consortium (CPTAC), and The Cancer Imaging Archive (TCIA) via an innovative cloud-based data analytics pipeline to fully unlock the potential of the Cancer Research Data Commons (CRDC). This will be accomplished by building a computational framework that integrates novel big data analysis algorithms into a cloud-based pipeline for revealing complex relationships between histopathology images, multi-omics, and phenotypic outcomes. This project not only facilitates the development of new big data analysis techniques, but also addresses emerging scientific questions in cancer research via a cloud-based data analytics pipeline that consists of innovative computational methods for multi-omics and imaging analysis and interfaced with CRDC. The proposed computational methods and pipeline are expected to impact cancer research and enable investigators to effectively test their scientific hypothesis.",
@@ -557,6 +578,7 @@ export const PROJECTS: Project[] = [
     name: "MetaboCraft",
     subtitle: "Tool for Metabolite Identification",
     phase: "Phase I",
+    awardHref: "https://reporter.nih.gov/project-details/9622659",
     /** @verbatim */
     abstract:
       "In a typical untargeted metabolomics analysis by liquid chromatography-mass spectrometry (LC-MS), about 70% of the detected ions represent unknown analytes. While identification of the unknowns without putative IDs remains a significant challenge, we have the opportunity to identify more metabolites by improving the ability to prioritize multiple putative IDs assigned to the known-unknowns. This will be tremendously helpful in selecting promising metabolites for the subsequent experimental verification of the IDs. This project seeks to develop a probabilistic framework that assigns a priority score to each putative metabolite ID by combining information from multiple resources including compound databases, pathways, biochemical networks, and spectral libraries. The proposed probabilistic model will exploit the inter-dependent relationships between metabolites in biological organisms based on knowledge derived from pathways and biochemical networks to assign priority score to each putative metabolite IDs. If MS/MS data are available, the score for a putative ID will take into account how well the measured MS/MS matches against those in spectral libraries or fragment patterns predicted by in-silico spectral interpretation. Successful implementation and validation of the model will enable users to accurately identify putative metabolite IDs and assign priority scores by taking advantage of publicly available databases, pathways, and biochemical networks, spectral libraries, as well as various tools designed for isotope/adduct recognition, decomposition of isotopic patterns, and in-silico spectral interpretation.",
@@ -566,6 +588,17 @@ export const PROJECTS: Project[] = [
     name: "SysMet",
     subtitle: "Integrative Systems Metabolomics",
     phase: "Phase I",
+    /**
+     * SUPPLIED AS A LEGACY URL, and left exactly as supplied.
+     * `projectreporter.nih.gov/project_info_description.cfm` is the retired
+     * pre-2018 RePORTER interface; NIH redirects it to the current site rather
+     * than 404ing, but it is the only one of the six not already on
+     * reporter.nih.gov. If the redirect is ever dropped, the modern equivalent
+     * is https://reporter.nih.gov/project-details/9568906 — the `aid` in the
+     * query string is the same project ID the new URLs use.
+     */
+    awardHref:
+      "https://projectreporter.nih.gov/project_info_description.cfm?aid=9568906&icde=41169685",
     /** @verbatim */
     abstract:
       "Metabolomics plays an indispensable role in the growing systems biology approaches to identify reliable cancer biomarkers. Liquid chromatography coupled to mass spectrometry (LC-MS) and gas chromatography coupled to mass spectrometry (GC-MS) have been extensively used for high-throughput comparison of the levels of thousands of metabolites among biological samples. However, the potential values of many disease-associated analytes discovered by these platforms have been inadequately explored in systems biology research due to lack of computational tools. Partly due to these limitations, poor reproducibility of previously identified metabolite biomarker candidates has been observed, especially when they are evaluated through independent platforms and validation sets. This project aims to address this challenge using a new software tool (SysMet) that utilizes a network-based approach to uncover relationships between disease and metabolites by investigating the rewiring and conserved interactions among metabolites in the progression of the disease. In addition, we propose to extend the network-based approach for integrative analysis of multi-omics data to identify disease-associated metabolites. The tool will contribute to improving the ability of researchers to discover biomarkers by enhancing the role of metabolomics in systems biology research.",
