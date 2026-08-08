@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 import { PIPELINE_STAGES } from "@/lib/content";
 import { cn } from "@/lib/utils";

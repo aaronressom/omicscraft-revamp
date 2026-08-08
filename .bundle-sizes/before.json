@@ -1,0 +1,38 @@
+{
+  "/about": {
+    "bytes": 931952,
+    "chunks": 13
+  },
+  "/contact": {
+    "bytes": 1240752,
+    "chunks": 14
+  },
+  "/": {
+    "bytes": 945437,
+    "chunks": 14
+  },
+  "/news": {
+    "bytes": 1255015,
+    "chunks": 14
+  },
+  "/platform": {
+    "bytes": 933320,
+    "chunks": 13
+  },
+  "/projects": {
+    "bytes": 934453,
+    "chunks": 13
+  },
+  "/services": {
+    "bytes": 920247,
+    "chunks": 12
+  },
+  "/_global-error": {
+    "bytes": 627381,
+    "chunks": 8
+  },
+  "/_not-found": {
+    "bytes": 920247,
+    "chunks": 12
+  }
+}

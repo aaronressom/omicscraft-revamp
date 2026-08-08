@@ -40,6 +40,13 @@ export function ProductLogo({
           width={833}
           height={523}
           priority={priority}
+          /* The box is an aspect-[16/9] card in a multi-column grid, never the
+           * 833px the source happens to be. Without `sizes` the srcset is built
+           * from `width` alone and the browser takes the ~833w candidate at
+           * every breakpoint, including a phone where the card is ~300px.
+           * Declared as a share of the viewport instead, so the requested
+           * candidate tracks the card. */
+          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           className="max-h-full w-auto object-contain"
         />
       ) : (

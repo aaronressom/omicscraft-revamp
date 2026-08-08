@@ -22,8 +22,25 @@ export function Logo({ className }: { className?: string }) {
     <Image
       src="/brand/omicscraft-logo.png"
       alt="OmicsCraft"
-      width={1095}
-      height={269}
+      /* SIZED TO THE BOX IT RENDERS IN, NOT TO THE SOURCE FILE.
+       *
+       * These were 1095x269 — the artwork's own dimensions. For a non-`fill`
+       * image Next builds its srcset from `width`, so it was offering a
+       * ~1095px-wide PNG for a slot that is 179px wide (h-11 = 44px at the
+       * artwork's 4.07 ratio). With `priority` below turning that into a
+       * <link rel="preload"> in <head>, every page on the site was preloading
+       * an oversized logo ahead of its own content.
+       *
+       * 358x88 is the rendered box at 2x, so retina still gets a pixel-exact
+       * lockup. The ratio is identical (4.07), so nothing about the layout
+       * moves — `h-11` was always what set the displayed size.
+       *
+       * If the header height changes, change these to match: 2 x the new
+       * pixel height, times 4.07 for the width. */
+      width={358}
+      height={88}
+      /* Kept: this genuinely is above the fold, in the fixed header, on every
+       * route. It is now a preload of ~180px of artwork instead of ~1100px. */
       priority
       /* w-fit is load-bearing: the footer places this in a `flex flex-col`,
          whose default align-items:stretch pulls the image to the full column

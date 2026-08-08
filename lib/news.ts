@@ -60,6 +60,38 @@ export type NewsItem = {
   placeholder?: boolean;
 };
 
+/**
+ * A news item with its link already worked out, ready to render.
+ *
+ * WHY THE EXTRA SHAPE. Resolving `href` needs `publicAssetExists`, which reads
+ * the filesystem and therefore only runs on the server, while the cards
+ * themselves now render on the client (they merge in locally-saved drafts —
+ * see lib/news-drafts.ts). So the server does the resolving once and hands
+ * across plain data. Nothing in this type may reference `node:` anything, or
+ * it stops crossing that boundary.
+ */
+export type ResolvedNewsLink = {
+  href: string;
+  /** Visible link text: "Read the paper", "View the session", … */
+  label: string;
+  /** Filename, set only when the href is a same-origin PDF to download. */
+  download?: string;
+};
+
+export type ResolvedNewsItem = {
+  slug: string;
+  title: string;
+  summary: string;
+  date: string;
+  datePrecision?: "day" | "month";
+  category: NewsCategory;
+  featured?: boolean;
+  link: ResolvedNewsLink | null;
+  siteHref?: string;
+  /** Added through the in-app editor: saved in one browser, not published. */
+  isDraft?: boolean;
+};
+
 export const NEWS_ITEMS: NewsItem[] = [
   {
     /**
@@ -158,7 +190,15 @@ export function formatNewsDate(
   });
 }
 
-/** `datetime` attribute: YYYY-MM for month precision, full ISO otherwise. */
-export function newsDateTime(item: NewsItem): string {
+/**
+ * `datetime` attribute: YYYY-MM for month precision, full ISO otherwise.
+ *
+ * Takes the two fields it reads rather than a whole NewsItem, so it works for
+ * a ResolvedNewsItem and for a locally-saved draft without three overloads.
+ */
+export function newsDateTime(item: {
+  date: string;
+  datePrecision?: "day" | "month";
+}): string {
   return item.datePrecision === "month" ? item.date.slice(0, 7) : item.date;
 }

@@ -23,9 +23,16 @@ import { cn } from "@/lib/utils";
  * opens in a dialog. No bio is shortened in the data - only visually clamped -
  * so the complete text is always one click away.
  *
- * Avatars render at 176px. The source photos range from 200x200 (Mengistu,
- * Yan) to 3487x3984 (Ressom); rendering larger would visibly soften the small
- * ones, so the box is capped to the smallest usable source.
+ * AVATAR SIZING. The layout box is 176px at xl (four columns) but the image is
+ * `w-full`, so it grows to roughly the column width as the grid drops to three,
+ * two and finally one card per row — about 310px on a phone. The `sizes`
+ * attribute on the <Image> below declares that, so each breakpoint requests a
+ * candidate that suits it instead of everything sharing the desktop one.
+ *
+ * The two smallest sources (Mengistu and Yan, both 200x200) are unaffected:
+ * Next's optimizer never upscales past the original, so they serve their native
+ * 200px exactly as before. The five larger photographs — Ressom is 3487x3984 —
+ * are the ones that were previously being served too small for a phone.
  */
 export function TeamGrid() {
   const [active, setActive] = useState<TeamMember | null>(null);
@@ -76,6 +83,23 @@ export function TeamGrid() {
                     alt={`${member.name}, ${member.role}`}
                     width={176}
                     height={176}
+                    /* MOBILE SHARPNESS FIX.
+                     *
+                     * The 176px above is the DESKTOP box (the xl 4-column
+                     * case), and the comment at the top of this file describes
+                     * it as though that were the size everywhere. It is not:
+                     * the class below is `w-full`, so on a phone the card is
+                     * the full column and the avatar renders around 310 CSS px.
+                     * Without `sizes`, Next builds its srcset from `width`
+                     * alone and offers at most 352w — under 2x for a 310px box,
+                     * so every avatar was soft on exactly the devices most
+                     * people use.
+                     *
+                     * These match the flex widths on the <li> above, in the
+                     * same order: full width, then halves at sm, thirds at lg,
+                     * quarters at xl. Desktop is unaffected — at xl this still
+                     * resolves to ~25vw, which is the 176px box it always was. */
+                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                 </span>

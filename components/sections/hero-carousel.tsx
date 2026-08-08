@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { ButtonLink } from "@/components/ui/button-link";
@@ -11,6 +11,7 @@ import { GlowBackdrop } from "@/components/visuals/glow-backdrop";
 import { MolecularBackdrop } from "@/components/visuals/molecular-backdrop";
 import { PipelineDiagram } from "@/components/visuals/pipeline-diagram";
 import { HERO, SLIDES } from "@/lib/content";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -106,7 +107,6 @@ export function HeroCarousel() {
   const [tabHidden, setTabHidden] = useState(false);
   const paused = focusPaused || tabHidden;
   const reduceMotion = useReducedMotion();
-  const regionRef = useRef<HTMLElement>(null);
 
   /**
    * Step one slide. The ONLY way the index moves.
@@ -171,7 +171,6 @@ export function HeroCarousel() {
 
   return (
     <section
-      ref={regionRef}
       aria-roledescription="carousel"
       aria-label="OmicsCraft highlights"
       onKeyDown={onKeyDown}
@@ -219,7 +218,21 @@ export function HeroCarousel() {
                   src={slide.image}
                   alt=""
                   fill
-                  priority={index === 1}
+                  /* NO `priority` HERE, DELIBERATELY.
+                   *
+                   * This was `priority={index === 1}`, which emitted a
+                   * <link rel="preload"> for slide 1's photograph. But slide 1
+                   * is not on screen at load — the carousel opens on slide 0,
+                   * which is the headline/CTA/pipeline slide and carries no
+                   * photograph at all. So the highest-priority image request on
+                   * the site's most-visited page was for something nobody could
+                   * see yet, competing with the fonts and the markup that
+                   * render the part they CAN see.
+                   *
+                   * Slide 1 does not appear for a full SLIDE_MS (6s), which is
+                   * an enormous head start by network standards; ordinary
+                   * loading covers it comfortably. Nothing above the fold on
+                   * this page is an <Image>, so nothing here wants priority. */
                   sizes="100vw"
                   quality={85}
                   className="object-cover object-center"
@@ -279,8 +292,11 @@ export function HeroCarousel() {
                 position={position}
                 isCurrent={isCurrent}
                 direction={direction}
-                reduceMotion={Boolean(reduceMotion)}
-                paused={paused || Boolean(reduceMotion)}
+                // No Boolean() wrapper needed: the local useReducedMotion
+                // returns a strict boolean, where motion/react's returned
+                // `boolean | null` and had to be coerced.
+                reduceMotion={reduceMotion}
+                paused={paused || reduceMotion}
                 // Exactly the inputs that restart the slide timer below, so
                 // slide 0's pipeline remounts — and so replays from 01/05 —
                 // whenever that timer does. Deriving it beats a counter in

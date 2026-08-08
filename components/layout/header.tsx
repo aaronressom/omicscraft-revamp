@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ButtonLink } from "@/components/ui/button-link";
+import { AccountMenu } from "@/components/admin/account-menu";
 import { Container } from "@/components/layout/container";
 import { Logo } from "@/components/layout/logo";
 import { NAV } from "@/lib/content";
@@ -87,31 +86,35 @@ export function Header() {
                       )}
                     >
                       {item.label}
-                      {active ? (
-                        <motion.span
-                          layoutId="nav-active"
-                          aria-hidden
-                          className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-cyan-400"
-                          transition={{
-                            type: "spring",
-                            stiffness: 380,
-                            damping: 32,
-                          }}
-                        />
-                      ) : (
-                        /* Hover preview of the active underline, wiping in from
-                           the left. Not part of the `layoutId` group — the
-                           shared-layout animation only tracks one element, and
-                           adding hover states to it would make the real
-                           indicator jump to whatever the pointer was over.
-                           This matters most on the landing page, which has no
-                           nav entry of its own and so had no underline at all
-                           until something else was active. */
-                        <span
-                          aria-hidden
-                          className="absolute inset-x-3 -bottom-px h-0.5 origin-left scale-x-0 rounded-full bg-cyan-400/70 transition-transform duration-300 ease-out group-hover:scale-x-100"
-                        />
-                      )}
+                      {/* ONE SPAN FOR BOTH STATES, CSS ONLY.
+
+                          This was a `motion.span` with `layoutId="nav-active"`,
+                          which slid the underline from the old item to the new
+                          one. It looked good and it cost the entire `motion`
+                          library on EVERY route — the Header is rendered by the
+                          root layout, so every page paid for one underline.
+                          Shared-layout animation is also the most expensive
+                          part of that library, since it carries the layout
+                          projection engine.
+
+                          Geometry, colour and size are unchanged: same
+                          `inset-x-3 -bottom-px h-0.5 rounded-full`, same
+                          cyan-400 active / cyan-400/70 hover. The only
+                          difference is the transition — it now wipes in from
+                          the left on the new item (`origin-left` + scale-x)
+                          instead of travelling across from the old one. That is
+                          the same gesture the hover preview always used, so
+                          active and hover are now one mechanism rather than two
+                          that had to be kept from fighting each other. */}
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "absolute inset-x-3 -bottom-px h-0.5 origin-left rounded-full transition-transform duration-300 ease-out",
+                          active
+                            ? "scale-x-100 bg-cyan-400"
+                            : "scale-x-0 bg-cyan-400/70 group-hover:scale-x-100",
+                        )}
+                      />
                     </Link>
                   </li>
                 );
@@ -120,24 +123,12 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* THIS IS THE SITE'S ONLY CONTACT LINK IN THE HEADER. The nav no
-                longer carries a Contact entry (see NAV in lib/content.ts) —
-                the two sat inches apart pointing at the same page, so the
-                button now owns that route outright rather than competing with
-                a text link for it.
-
-                Which means the label has to be plain. "Book a demo" read as a
-                different, narrower offer; this is the general way in.
-
-                Consequence to keep in mind: on desktop, removing this button
-                removes the only route to /contact from the header. h-11 keeps
-                it at a 44px tap target. */}
-            <ButtonLink
-              href="/contact"
-              className="hidden h-11 rounded-xl px-5 text-sm font-semibold lg:inline-flex"
-            >
-              Get in touch
-            </ButtonLink>
+            {/* The "Get in touch" button that used to sit here is gone; Contact
+                went back into the nav in the same round (see NAV in
+                lib/content.ts). This slot is the account control now, at every
+                width — the mobile drawer has no room for a second entry point
+                and a sign-in that only works on a laptop is not one. */}
+            <AccountMenu />
 
             {/* Mobile drawer */}
             <Sheet open={open} onOpenChange={setOpen}>
@@ -189,15 +180,9 @@ export function Header() {
                       );
                     })}
                   </ul>
-
-                  <ButtonLink
-                    href="/contact"
-                    size="xl"
-                    className="mt-6 w-full"
-                    onClick={() => setOpen(false)}
-                  >
-                    Get in touch
-                  </ButtonLink>
+                  {/* No CTA under the list any more: Contact is one of the
+                      items above it, and repeating it as a button made the
+                      drawer's last two rows the same link twice. */}
                 </nav>
               </SheetContent>
             </Sheet>

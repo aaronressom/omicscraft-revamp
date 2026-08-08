@@ -83,6 +83,10 @@ export default function RootLayout({
         >
           Skip to content
         </a>
+        {/* No auth provider wrapping this. The two places that care who is
+            signed in — the header's account icon and the News editor — both
+            read the same external store through `useAuth`, so they agree
+            without a shared React tree. See components/admin/use-auth.ts. */}
         <Header />
         {children}
         <Footer />

@@ -57,14 +57,13 @@ export const SITE = {
 } as const;
 
 /**
- * Top navigation.
+ * Top navigation. Anything added here appears in both the desktop nav and the
+ * mobile drawer.
  *
- * NO CONTACT ENTRY — that is the header's "Get in touch" button, which is
- * bigger, is the only filled element up there, and points at the same page.
- * Listing it twice split the emphasis between them. /contact is still a real
- * route and still linked from the hero's secondary CTA; it just is not in this
- * list. Anything added here appears in both the desktop nav and the mobile
- * drawer.
+ * Contact briefly left this list while the header carried a "Get in touch"
+ * button — two links to the same page inches apart. The button is now the
+ * account icon (see account-menu.tsx), so Contact is back to being an ordinary
+ * nav item, and it is once again the only route to /contact in the header.
  */
 export const NAV = [
   { label: "Software Platform", href: "/platform" },
@@ -72,6 +71,7 @@ export const NAV = [
   { label: "Projects", href: "/projects" },
   { label: "News", href: "/news" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 /* -------------------------------------------------------------------------- */
@@ -588,17 +588,12 @@ export const PROJECTS: Project[] = [
     name: "SysMet",
     subtitle: "Integrative Systems Metabolomics",
     phase: "Phase I",
-    /**
-     * SUPPLIED AS A LEGACY URL, and left exactly as supplied.
-     * `projectreporter.nih.gov/project_info_description.cfm` is the retired
-     * pre-2018 RePORTER interface; NIH redirects it to the current site rather
-     * than 404ing, but it is the only one of the six not already on
-     * reporter.nih.gov. If the redirect is ever dropped, the modern equivalent
-     * is https://reporter.nih.gov/project-details/9568906 — the `aid` in the
-     * query string is the same project ID the new URLs use.
-     */
+    /* Replaced the legacy `projectreporter.nih.gov/project_info_description.cfm`
+       URL supplied earlier — that is the retired pre-2018 RePORTER interface
+       and depended on an NIH redirect still being in place. Same project
+       (9568906), current host. */
     awardHref:
-      "https://projectreporter.nih.gov/project_info_description.cfm?aid=9568906&icde=41169685",
+      "https://reporter.nih.gov/search/CQxp7859zk-fQLjZ_1tGqw/project-details/9568906",
     /** @verbatim */
     abstract:
       "Metabolomics plays an indispensable role in the growing systems biology approaches to identify reliable cancer biomarkers. Liquid chromatography coupled to mass spectrometry (LC-MS) and gas chromatography coupled to mass spectrometry (GC-MS) have been extensively used for high-throughput comparison of the levels of thousands of metabolites among biological samples. However, the potential values of many disease-associated analytes discovered by these platforms have been inadequately explored in systems biology research due to lack of computational tools. Partly due to these limitations, poor reproducibility of previously identified metabolite biomarker candidates has been observed, especially when they are evaluated through independent platforms and validation sets. This project aims to address this challenge using a new software tool (SysMet) that utilizes a network-based approach to uncover relationships between disease and metabolites by investigating the rewiring and conserved interactions among metabolites in the progression of the disease. In addition, we propose to extend the network-based approach for integrative analysis of multi-omics data to identify disease-associated metabolites. The tool will contribute to improving the ability of researchers to discover biomarkers by enhancing the role of metabolomics in systems biology research.",
